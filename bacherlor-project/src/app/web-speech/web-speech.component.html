@@ -1,0 +1,22 @@
+<section>
+    <mat-card *ngIf="errorMessage$| async as errorMessage" class="notification">{{errorMessage}}</mat-card>
+</section>
+<section>
+    <button mat-fab *ngIf="listening$ | async; else mic" (click)="stop()">
+      <mat-icon class="soundwave">mic</mat-icon>
+    </button>
+    <ng-template #mic>
+      <button mat-fab (click)="start()">
+        <mat-icon>mic</mat-icon>
+      </button>
+    </ng-template>
+</section>
+<section >
+  <label for="temporary">Spoken Sentence</label>
+  <textarea id="temporary" [value]="transcript$ | async" disabled="true">hello world</textarea>
+</section>
+<section>
+  <label for="full">Full Transcript</label>
+  <div id="full" (click)="wordClicked($event)" [innerHTML]="totalTranscript | transcriptFormat"></div>
+</section>
+{{totalTranscript}}
