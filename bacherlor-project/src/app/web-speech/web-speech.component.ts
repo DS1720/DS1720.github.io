@@ -7,6 +7,7 @@ import { SpeechEvent } from '../shared/model/speech-event';
 import { SpeechRecognizerService } from '../shared/services/web-apis/speech-recognizer.service';
 import { ActionContext } from '../shared/services/actions/action-context';
 import { SpeechNotification } from '../shared/model/speech-notification';
+import {StudentError} from '../shared/Entities/student-error';
 
 @Component({
   selector: 'wsa-web-speech',
@@ -31,7 +32,7 @@ export class WebSpeechComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.totalTranscript = 'I´ve no <error id="2" type="error1"/> Idea <error id="3" type="error1"/> why <error id="2"/>. I am<error id="3"/>actually here what <error id="3" type="error2"/>about<error id="3"/> you?';
+    this.totalTranscript = 'I´ve no <error id="23" type="error1"/> Idea <error id="1" type="error1"/> why <error id="23"/>. I am <error id="1"/>actually here what <error id="3" type="error2"/>about<error id="3"/> you?';
     const webSpeechReady = this.speechRecognizer.initialize(this.currentLanguage);
     if (webSpeechReady) {
       this.initRecognition();
@@ -44,7 +45,6 @@ export class WebSpeechComponent implements OnInit {
     const selection = window.getSelection();
     if (selection != null) {
       const range = selection.getRangeAt(0);
-      console.log(range);
       let globalIndexes = [-1, -1];
       // if word is clicked
       if (range.startOffset === range.endOffset) {
@@ -110,9 +110,9 @@ export class WebSpeechComponent implements OnInit {
     return [startindex, endindex];
   }
   saveAnnotation(start: number, end: number, annotationType: string): void {
-    this.insertIntoTranscript(end, `<error id="999"/>`);
-    this.insertIntoTranscript(start, `<error id="9999" type="${annotationType}"/>`);
-    console.log(`Start Index: ${start}, End Index: ${end}, annotationtype: ${annotationType}`);
+    const newId = StudentError.getNewId(StudentError.getErrorsFromString(this.totalTranscript));
+    this.insertIntoTranscript(end, `<error id="${newId}"/>`);
+    this.insertIntoTranscript(start, `<error id="${newId}" type="${annotationType}"/>`);
   }
 
   insertIntoTranscript(index: number, text: string): void {
