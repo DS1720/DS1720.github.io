@@ -13,11 +13,14 @@
 </section>
 <section >
   <label for="temporary">Spoken Sentence</label>
-  <textarea id="temporary" [value]="transcript$ | async" disabled="true">hello world</textarea>
+  <textarea id="temporary" [value]="transcript$ | async" >hello world</textarea>
 </section>
 <section>
   <label for="full">Full Transcript</label>
-  <div id="full" class="showSpaces" (click)="wordClicked($event)" [innerHTML]="totalTranscript | transcriptFormat"></div>
+  <div id="full">
+  <span class="showSpaces" (click)="wordClicked($event)" [innerHTML]="totalTranscript | transcriptFormat"></span>
+    <span class="temporaryText">{{transcript$ | async}}</span>
+  </div>
 </section>
 <section>
   <div *ngFor="let error of errorTypes">

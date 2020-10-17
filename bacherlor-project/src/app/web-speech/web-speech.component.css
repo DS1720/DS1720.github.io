@@ -24,6 +24,10 @@ section textarea {
   white-space: pre;
 }
 
+.temporaryText {
+  color: grey;
+}
+
 /*all spans*/
 :host /deep/ .generalError, .pronunciation, .grammar, .wordchoice, .anothererror, .errortype5 {
   display: inline-block;
