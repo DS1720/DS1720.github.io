@@ -17,6 +17,17 @@
 </section>
 <section>
   <label for="full">Full Transcript</label>
-  <div id="full" (click)="wordClicked($event)" [innerHTML]="totalTranscript | transcriptFormat"></div>
+  <div id="full" class="showSpaces" (click)="wordClicked($event)" [innerHTML]="totalTranscript | transcriptFormat"></div>
 </section>
+<section>
+  <div *ngFor="let error of errorTypes">
+      <button [class.active]="error==activeErrorType" (click)="changeErrorType(error)">{{error}}</button>
+  </div>
+</section>
+{{activeErrorType}}
+
 {{totalTranscript}}
+
+<span class="pronunciation outer">hello</span><span class="grammar"><span class="pronunciation">Hello asdlkjsc </span></span>
+
+I´ve no Idea why. I<span class="grammar"> am </span><span class="pronunciation"><span class="grammar">actua</span></span><span class="pronunciation">lly</span> here what about you?

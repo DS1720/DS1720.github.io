@@ -20,6 +20,48 @@ section textarea {
   background: white;
 }
 
-:host ::ng-deep .error {
-  text-decoration: underline;
+.showSpaces {
+  white-space: pre;
+}
+
+/*all spans*/
+:host /deep/ .generalError, .pronunciation, .grammar, .wordchoice, .anothererror, .errortype5 {
+  display: inline-block;
+}
+
+
+:host /deep/ .generalError {
+  border-bottom: 2px solid green;
+  display: inline-block;
+}
+
+:host /deep/ .pronunciation {
+  border-bottom: 2px solid blueviolet;
+  display: inline-block;
+}
+
+:host /deep/ .grammar {
+  border-bottom: 2px solid orange;
+  display: inline-block;
+}
+
+:host /deep/ .wordchoice {
+  border-bottom: 2px solid red;
+  display: inline-block;
+}
+
+:host /deep/ .anothererror {
+  border-bottom: 2px solid dodgerblue;
+  display: inline-block;
+}
+
+:host /deep/ .errortype5 {
+  border-bottom: 2px solid blue;
+  display: inline-block;
+}
+
+
+
+button.active {
+  color: red;
 }

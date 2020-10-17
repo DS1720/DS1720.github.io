@@ -8,6 +8,7 @@ import { SpeechRecognizerService } from '../shared/services/web-apis/speech-reco
 import { ActionContext } from '../shared/services/actions/action-context';
 import { SpeechNotification } from '../shared/model/speech-notification';
 import {StudentError} from '../shared/Entities/student-error';
+import {StudentErrorType} from '../shared/Entities/student-error-type.enum';
 
 @Component({
   selector: 'wsa-web-speech',
@@ -20,11 +21,12 @@ export class WebSpeechComponent implements OnInit {
   languages: string[] = languages;
   currentLanguage: string = defaultLanguage;
   totalTranscript = '';
-
   transcript$?: Observable<string>;
   listening$?: Observable<boolean>;
   errorMessage$?: Observable<string>;
   defaultError$ = new Subject<string | undefined>();
+  errorTypes: string[] = [];
+  activeErrorType = '';
 
   constructor(
     private speechRecognizer: SpeechRecognizerService,
@@ -32,13 +34,21 @@ export class WebSpeechComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.totalTranscript = 'I´ve no <error id="23" type="error1"/> Idea <error id="1" type="error1"/> why <error id="23"/>. I am <error id="1"/>actually here what <error id="3" type="error2"/>about<error id="3"/> you?';
+    this.totalTranscript = 'I´ve no Idea why. I am actually here what about you?';
     const webSpeechReady = this.speechRecognizer.initialize(this.currentLanguage);
     if (webSpeechReady) {
       this.initRecognition();
     }else {
       this.errorMessage$ = of('Your Browser is not supported. Please try Google Chrome.');
     }
+    for (const error of Object.keys(StudentErrorType)) {
+      this.errorTypes.push(error);
+    }
+    this.activeErrorType = this.errorTypes[0];
+  }
+
+  changeErrorType(type: string): void {
+    this.activeErrorType = type;
   }
 
   wordClicked(event: Event): void {
@@ -55,7 +65,7 @@ export class WebSpeechComponent implements OnInit {
       } else {
         globalIndexes = this.getGlobalIndex(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
       }
-      this.saveAnnotation(globalIndexes[0], globalIndexes[1], 'error');
+      this.saveAnnotation(globalIndexes[0], globalIndexes[1], this.activeErrorType.split(' ').join(''));
       const charPos = selection.focusOffset;
     }
   }
