@@ -1,7 +1,66 @@
-<section>
-    <mat-card *ngIf="errorMessage$| async as errorMessage" class="notification">{{errorMessage}}</mat-card>
-</section>
-<section>
+<!--section>
+  <mat-card *ngIf="errorMessage$| async as errorMessage" class="notification">{{errorMessage}}</mat-card>
+</section-->
+
+<div id="grid">
+  <div class="properties-container">
+    <section class="student-properties-container">
+      <div>
+        <h1>{{activeStudent.name}}</h1>
+        {{exam.name}} | {{activeStudent.course}}
+      </div>
+      <div class="record-button">
+        <button (click)="toogleListening()" class="recording" [class.active]="listening()">
+          <mat-icon class="soundwave">mic</mat-icon>
+        </button>
+        <div>
+          <span *ngIf="!listening()">Start Recording</span>
+          <span *ngIf="listening()">Stop Recording</span>
+        </div>
+      </div>
+    </section>
+    <section class="notes-container">
+      <div class="notes-flex-item">
+        <label for="notesStudent">Notes For Student</label>
+        <textarea name="notesStudent" id="notesStudent"></textarea>
+      </div>
+      <div class="notes-flex-item">
+        <label for="notesExaminer">Notes For Eaxminer (cannot be seen by student)</label>
+        <textarea name="notesExaminer" id="notesExaminer"></textarea>
+      </div>
+    </section>
+    <section class="points-container">
+      <div>
+      <h3>Points reached:</h3>
+      <div class="flex-container-points">
+        <input type="number" [(ngModel)]="exam.reachedPoints"><span>/{{exam.maxPoints}} Pts.</span>
+      </div>
+      </div>
+      <div class="button-row">
+        <button>Save</button>
+        <button>Save & Exit</button>
+      </div>
+    </section>
+  </div>
+  <div class="transcript-error-container">
+    <section class="transcript-container">
+      <label for="full-transcript">Full Transcript</label>
+      <div id="full-transcript">
+        <span class="showSpaces transcipt" (click)="wordClicked($event)"
+              [innerHTML]="totalTranscript | transcriptFormat"></span>
+        <span class="temporaryText">{{transcript$ | async}}</span>
+      </div>
+
+    </section>
+    <section class="student-errors-container">
+      <div class="error-item" *ngFor="let error of errorTypes">
+        <button [class.active]="error==activeErrorType" class="{{error.split(' ').join('')}}"
+                (click)="changeErrorType(error)">{{error}}</button>
+      </div>
+    </section>
+  </div>
+  <!--
+  <section>
     <button mat-fab *ngIf="listening$ | async; else mic" (click)="stop()">
       <mat-icon class="soundwave">mic</mat-icon>
     </button>
@@ -10,27 +69,6 @@
         <mat-icon>mic</mat-icon>
       </button>
     </ng-template>
-</section>
-<section >
-  <label for="temporary">Spoken Sentence</label>
-  <textarea id="temporary" [value]="transcript$ | async" >hello world</textarea>
-</section>
-<section>
-  <label for="full">Full Transcript</label>
-  <div id="full">
-  <span class="showSpaces" (click)="wordClicked($event)" [innerHTML]="totalTranscript | transcriptFormat"></span>
-    <span class="temporaryText">{{transcript$ | async}}</span>
-  </div>
-</section>
-<section>
-  <div *ngFor="let error of errorTypes">
-      <button [class.active]="error==activeErrorType" (click)="changeErrorType(error)">{{error}}</button>
-  </div>
-</section>
-{{activeErrorType}}
-
-{{totalTranscript}}
-
-<span class="pronunciation outer">hello</span><span class="grammar"><span class="pronunciation">Hello asdlkjsc </span></span>
-
-I´ve no Idea why. I<span class="grammar"> am </span><span class="pronunciation"><span class="grammar">actua</span></span><span class="pronunciation">lly</span> here what about you?
+  </section>
+  -->
+</div>

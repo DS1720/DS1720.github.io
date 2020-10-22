@@ -11,7 +11,7 @@ export class TranscriptFormatPipe implements PipeTransform {
     const spans = this.getSpans(errors);
     for (const span of spans) {
       if (span.start === true) {
-        text = this.insertIntoText(text, `<span class="${span.type}">`, span.index);
+        text = this.insertIntoText(text, `<span class="${span.type} tooltip">`, span.index);
       } else {
         text = this.insertIntoText(text, `</span>`, span.index);
       }

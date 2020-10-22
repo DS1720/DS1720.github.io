@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { WebSpeechComponent } from './web-speech.component';
 import { MaterialModule } from '../shared/material/material.module';
 import {SharedModule} from '../shared/shared.module';
+import {FormsModule} from '@angular/forms';
+import {MatTooltipModule} from '@angular/material/tooltip';
 
 
 @NgModule({
@@ -13,7 +15,9 @@ import {SharedModule} from '../shared/shared.module';
     imports: [
         CommonModule,
         MaterialModule,
-        SharedModule
+        SharedModule,
+        FormsModule,
+        MatTooltipModule
     ]
 })
 export class WebSpeechModule { }
