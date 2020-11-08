@@ -7,10 +7,16 @@ import {split} from 'ts-node';
 })
 export class TranscriptFormatPipe implements PipeTransform {
 
+  /**
+   * insert spans into transcript with existing error tags
+   * @param transcript that should be processed
+   */
   transform(transcript: string): string {
+    // get all errors
     const errors = StudentError.getErrorsFromString(transcript);
-    const spans = this.getSpans(errors, transcript);
-    console.log(spans);
+    // get spans
+    const spans = this.getSpans(errors);
+    // insert start and end spans separately with span type and side as class
     for (const span of spans) {
       if (span.start === true) {
         transcript = this.insertIntoText(transcript, `<span class="${span.type} ${span.side} tooltip">`, span.index);
@@ -18,10 +24,16 @@ export class TranscriptFormatPipe implements PipeTransform {
         transcript = this.insertIntoText(transcript, `</span>`, span.index);
       }
     }
-    console.log(transcript);
     return transcript;
   }
 
+  /**
+   * insert string into exisiting string
+   * @param originalText where a string is inserted
+   * @param insertedText string that is inserted
+   * @param index where insertedText is inserted
+   * @return processed string
+   */
   insertIntoText(originalText: string, insertedText: string, index: number): string {
     return [originalText.slice(0, index), insertedText, originalText.slice(index)].join('');
   }
@@ -30,17 +42,17 @@ export class TranscriptFormatPipe implements PipeTransform {
    * returns spans in order from back to front
    * @param errors made in the text
    */
-  getSpans(errors: StudentError[], transcript: string): { index: number, type?: string, id: number, start: boolean, side: string }[] {
+  getSpans(errors: StudentError[]): { index: number, type?: string, id: number, start: boolean, side: string }[] {
     const spans: {index: number, type?: string, id: number, start: boolean, side: string}[] = [];
     // insert a span for every word in error
-    console.log(errors);
     for (const studentError of errors) {
       const originalText = studentError.getText();
       const text = originalText.substr(studentError.getOffsetFront(),
         originalText.length - studentError.getOffsetFront() - studentError.getOffsetBack());
+      // get start index of text in error
       let currentIndex = studentError.getStartIndex() + studentError.getOffsetFront();
-      const inTag = false;
       // split text fragments from errorTags
+      // splittedText only contains words or errorTags separately
       const splittedText = text.split('<');
       for (let i = 0; i < splittedText.length; i++) {
         const tempFragments = (splittedText[i]).split('>');
@@ -50,9 +62,8 @@ export class TranscriptFormatPipe implements PipeTransform {
           i++;
         }
       }
-      // split every word thats not errorTag without losing spaces
+      // split every word that is not errorTag without losing spaces
       for (let i = 0; i < splittedText.length; i++) {
-        console.log(splittedText);
         if (splittedText[i].search('<') === -1) {
           const tempFragments = (splittedText[i]).split(' ');
           // join first and/or last whitespace
@@ -82,13 +93,13 @@ export class TranscriptFormatPipe implements PipeTransform {
       }
       const spansErrorStart: { index: number, type?: string, id: number, start: boolean, side: string }[] = [];
       const spansErrorEnd: { index: number, type?: string, id: number, start: boolean, side: string }[] = [];
-      console.log(studentError, splittedText);
       for (const originalTextFragment of splittedText) {
         // Start Tag
         const regexStart = /<error id="\d*" type="\w*"\/>/;
         const regexEnd = /<error id="\d*"\/>/;
         const isStartTag = originalTextFragment.search(regexStart) !== -1;
         const isEndTag = originalTextFragment.search(regexEnd) !== -1;
+        // only insert if fragment is no start or end Tag and is not Empty
         if (!(isStartTag || isEndTag) && originalTextFragment !== '') {
           spansErrorStart.push({
             index: currentIndex,
@@ -105,13 +116,15 @@ export class TranscriptFormatPipe implements PipeTransform {
             side: ''
           });
         }
+        //add processed Text to current Index
         currentIndex += originalTextFragment.length;
       }
+      // if only one word was processed add left and right border
       if (spansErrorStart.length === 1) {
         spansErrorStart[0].side = 'left right';
-      } else if (spansErrorStart.length > 0) {
-        spansErrorStart[0].side = 'left';
-        spansErrorStart[spansErrorStart.length - 1].side = 'right';
+      } else if (spansErrorStart.length > 0) { // if more than one word was processed
+        spansErrorStart[0].side = 'left'; // add left border for first word
+        spansErrorStart[spansErrorStart.length - 1].side = 'right'; // add right border for last word
       }
       spansErrorStart.forEach(span => spans.push(span));
       spansErrorEnd.forEach(span => spans.push(span));

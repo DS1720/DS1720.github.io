@@ -87,55 +87,42 @@ export class WebSpeechComponent implements OnInit {
     this.activeErrorType = this.errorTypes[0];
   }
 
+  // changes type of error
   changeErrorType(type: string): void {
     this.activeErrorType = type;
   }
 
+  /**
+   * is called when a word is marked or clicked in transcript
+   * calculates indices of click
+   * if errortype is error saves error
+   * if errortype is delete deletes error
+   * if errortype is edit opens edit dialoge
+   */
   wordClicked(event: Event): void {
     const selection = window.getSelection();
     if (selection != null) {
+      // get range that is clicked
       const range = selection.getRangeAt(0);
       let globalIndexes = [-1, -1];
-      // if word is clicked
+      // if word is clicked calculate indices (only one index is returned)
       if (range.startOffset === range.endOffset) {
         const wordIndexes = this.getWordIndexByChar(range.startContainer.textContent, range.startOffset);
         if (wordIndexes[0] !== -1 && wordIndexes[1] !== -1) {
           globalIndexes = this.getGlobalIndex(range.startContainer, wordIndexes[0], range.endContainer, wordIndexes[1]);
         }
-      } else {
+      } else { // if more than one word is clicked
         globalIndexes = this.getGlobalIndex(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
       }
-      this.saveAnnotation(globalIndexes[0], globalIndexes[1], this.activeErrorType.split(' ').join(''));
-      const charPos = selection.focusOffset;
-    }
-  }
-
-  getTextWithoutHTMLElements(text: string): string {
-    return text.replace(/<[^>]+>/g, '');
-  }
-
-  getGlobalIndex(startContainer: Node, start: number, endContainer: Node, end: number): number[] {
-    const indexesFront = this.getIndexesBefore(startContainer);
-    const indexesBack = this.getIndexesBefore(endContainer);
-    return [indexesFront + start, indexesBack + end];
-  }
-
-  getIndexesBefore(node: Node): number {
-    let currentNode = node;
-    let indexesFront = 0;
-    while (currentNode !== null && (currentNode.previousSibling !== null ||
-      (currentNode.parentElement != null && currentNode.parentElement.getAttribute('id') !== 'full-transcript'))) {
-      if (currentNode.previousSibling !== null) {
-        currentNode = currentNode.previousSibling;
-      } else if (currentNode.parentElement !== null) {
-        currentNode = currentNode.parentElement;
-        continue;
-      }
-      if (currentNode.textContent !== null) {
-        indexesFront += currentNode.textContent.length;
+      // if error type is selected save error
+      if (this.activeErrorType !== 'delete' && this.activeErrorType !== 'edit') {
+        this.saveAnnotation(globalIndexes[0], globalIndexes[1], this.activeErrorType.split(' ').join(''));
+      } else if (this.activeErrorType === 'delete') {
+        // delete error
+      } else if (this.activeErrorType === 'edit') {
+        // edit marked text
       }
     }
-    return indexesFront;
   }
 
   /**
@@ -162,12 +149,58 @@ export class WebSpeechComponent implements OnInit {
     return [startindex, endindex];
   }
 
+  /**
+   * returns start and end indices of chosen containers
+   * @param startContainer of selected word
+   * @param start index
+   * @param endContainer of selected word
+   * @param end index
+   */
+  getGlobalIndex(startContainer: Node, start: number, endContainer: Node, end: number): number[] {
+    const indexesFront = this.getIndicesBefore(startContainer);
+    const indexesBack = this.getIndicesBefore(endContainer);
+    return [indexesFront + start, indexesBack + end];
+  }
+
+  /**
+   * returns index of char at the start of parent Node
+   * @param node that was clicked
+   */
+  getIndicesBefore(node: Node): number {
+    let currentNode = node;
+    let indexesFront = 0;
+    while (currentNode !== null && (currentNode.previousSibling !== null ||
+      (currentNode.parentElement != null && currentNode.parentElement.getAttribute('id') !== 'full-transcript'))) {
+      if (currentNode.previousSibling !== null) {
+        currentNode = currentNode.previousSibling;
+      } else if (currentNode.parentElement !== null) {
+        currentNode = currentNode.parentElement;
+        continue;
+      }
+      if (currentNode.textContent !== null) {
+        indexesFront += currentNode.textContent.length;
+      }
+    }
+    return indexesFront;
+  }
+
+  /**
+   * saves error annotation
+   * @param start index
+   * @param end index
+   * @param annotationType of error
+   */
   saveAnnotation(start: number, end: number, annotationType: string): void {
     const newId = StudentError.getNewId(StudentError.getErrorsFromString(this.totalTranscript));
     this.insertIntoTranscript(end, `<error id="${newId}"/>`);
     this.insertIntoTranscript(start, `<error id="${newId}" type="${annotationType}"/>`);
   }
 
+  /**
+   * insert text into
+   * @param index insertion
+   * @param text that is inserted
+   */
   insertIntoTranscript(index: number, text: string): void {
     let counter = 0;
     let inTag = false;
@@ -186,6 +219,9 @@ export class WebSpeechComponent implements OnInit {
     this.totalTranscript = [this.totalTranscript.slice(0, totalIndex), text, this.totalTranscript.slice(totalIndex)].join('');
   }
 
+  /**
+   * toggles between listening and not listening
+   */
   toogleListening(): void {
     if (this.isListening) {
       this.stop();
@@ -194,6 +230,10 @@ export class WebSpeechComponent implements OnInit {
     }
   }
 
+  /**
+   * starts transcript recording when not recording
+   * ends recording if already recording
+   */
   start(): void {
     if (this.speechRecognizer.isListening) {
       this.stop();
@@ -205,23 +245,17 @@ export class WebSpeechComponent implements OnInit {
     this.isListening = true;
   }
 
-  listening(): boolean {
-    return this.isListening;
-  }
-
+  /**
+   * stops recording of transcript
+   */
   stop(): void {
     this.speechRecognizer.stop();
     this.isListening = false;
   }
 
-  selectLanguage(language: string): void {
-    if (this.speechRecognizer.isListening) {
-      this.stop();
-    }
-    this.currentLanguage = language;
-    this.speechRecognizer.setLanguage(this.currentLanguage);
-  }
-
+  /**
+   * initialise recognition
+   */
   private initRecognition(): void {
     this.transcript$ = this.speechRecognizer.onResult().pipe(
       tap((notification) => {
@@ -268,6 +302,11 @@ export class WebSpeechComponent implements OnInit {
     );
   }
 
+  /**
+   * process speech segment that was recorded
+   * @param notification contains text that was recorded
+   * @private
+   */
   private processNotification(notification: SpeechNotification<string>): void {
     if (notification.event === SpeechEvent.FinalContent) {
       const message = notification.content?.trim() || '';
@@ -275,6 +314,10 @@ export class WebSpeechComponent implements OnInit {
       // this.actionContext.runAction(message, this.currentLanguage);
       this.totalTranscript = `${this.totalTranscript} ${message}.`;
     }
+  }
+
+  listening(): boolean {
+    return this.isListening;
   }
 
 }
