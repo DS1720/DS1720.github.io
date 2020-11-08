@@ -9,7 +9,6 @@ import { ModalHelpComponent } from './shared/components/modal-help/modal-help.co
 })
 export class AppComponent {
   constructor(public dialog: MatDialog) {}
-
   openHelp(): void {
     this.dialog.open(ModalHelpComponent);
   }

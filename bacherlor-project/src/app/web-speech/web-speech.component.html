@@ -11,7 +11,8 @@
       </div>
       <div class="record-button">
         <button (click)="toogleListening()" class="recording" [class.active]="listening()">
-          <mat-icon class="soundwave">mic</mat-icon>
+          <fa-icon *ngIf="listening()" [icon]="faMicrophone"></fa-icon>
+          <fa-icon *ngIf="!listening()" [icon]="faMicrophoneSlash"></fa-icon>
         </button>
         <div>
           <span *ngIf="!listening()">Start Recording</span>
@@ -19,7 +20,42 @@
         </div>
       </div>
     </section>
-    <section class="notes-container">
+    <section class="transcript-container">
+      <label for="full-transcript">Full Transcript</label>
+      <div id="full-transcript">
+        <span class="showSpaces transcipt" (click)="wordClicked($event)"
+              [innerHTML]="totalTranscript | transcriptFormat"></span>
+        <span class="temporaryText">{{transcript$ | async}}</span>
+      </div>
+
+    </section>
+  </div>
+  <section class="student-errors-container">
+      <div class="error-item" *ngFor="let error of errorTypes">
+        <button [class.active]="error==activeErrorType" class="{{error.split(' ').join('')}}"
+                (click)="changeErrorType(error)">{{error}}</button>
+      </div>
+      <div class="split-buttons">
+        <button class="delete" [class.active]="'delete'==activeErrorType" (click)="changeErrorType('delete')">Delete Error</button>
+        <button class="edit" [class.active]="'edit'==activeErrorType" (click)="changeErrorType('edit')">Edit Text</button>
+      </div>
+      <div class="split-buttons">
+        <button class="save">Save</button>
+        <button class="save">Save & Exit</button>
+      </div>
+  </section>
+  <!--
+  <section>
+    <button mat-fab *ngIf="listening$ | async; else mic" (click)="stop()">
+      <mat-icon class="soundwave">mic</mat-icon>
+    </button>
+    <ng-template #mic>
+      <button mat-fab (click)="start()">
+        <mat-icon>mic</mat-icon>
+      </button>
+    </ng-template>
+  </section>
+  <section class="notes-container">
       <div class="notes-flex-item">
         <label for="notesStudent">Notes For Student</label>
         <textarea name="notesStudent" id="notesStudent"></textarea>
@@ -41,34 +77,5 @@
         <button>Save & Exit</button>
       </div>
     </section>
-  </div>
-  <div class="transcript-error-container">
-    <section class="transcript-container">
-      <label for="full-transcript">Full Transcript</label>
-      <div id="full-transcript">
-        <span class="showSpaces transcipt" (click)="wordClicked($event)"
-              [innerHTML]="totalTranscript | transcriptFormat"></span>
-        <span class="temporaryText">{{transcript$ | async}}</span>
-      </div>
-
-    </section>
-    <section class="student-errors-container">
-      <div class="error-item" *ngFor="let error of errorTypes">
-        <button [class.active]="error==activeErrorType" class="{{error.split(' ').join('')}}"
-                (click)="changeErrorType(error)">{{error}}</button>
-      </div>
-    </section>
-  </div>
-  <!--
-  <section>
-    <button mat-fab *ngIf="listening$ | async; else mic" (click)="stop()">
-      <mat-icon class="soundwave">mic</mat-icon>
-    </button>
-    <ng-template #mic>
-      <button mat-fab (click)="start()">
-        <mat-icon>mic</mat-icon>
-      </button>
-    </ng-template>
-  </section>
   -->
 </div>

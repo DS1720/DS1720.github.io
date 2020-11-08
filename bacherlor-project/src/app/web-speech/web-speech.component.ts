@@ -9,6 +9,8 @@ import { ActionContext } from '../shared/services/actions/action-context';
 import { SpeechNotification } from '../shared/model/speech-notification';
 import {StudentError} from '../shared/Entities/student-error';
 import {StudentErrorType} from '../shared/Entities/student-error-type.enum';
+import { faMicrophone } from '@fortawesome/free-solid-svg-icons';
+import { faMicrophoneSlash } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'wsa-web-speech',
@@ -17,6 +19,8 @@ import {StudentErrorType} from '../shared/Entities/student-error-type.enum';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WebSpeechComponent implements OnInit {
+  faMicrophone = faMicrophone;
+  faMicrophoneSlash = faMicrophoneSlash;
   SEPARATORS = ['.', ' ', ',', '!', '?'];
   languages: string[] = languages;
   currentLanguage: string = defaultLanguage;
@@ -40,6 +44,22 @@ export class WebSpeechComponent implements OnInit {
 
   ngOnInit(): void {
     this.totalTranscript = 'Flamingos usually stand on one leg, with the other being tucked beneath the body. ' +
+      'The reason for this behaviour is not fully understood. One theory is that standing on one leg allows the ' +
+      'birds to conserve more body heat, given that they spend a significant amount of time wading in cold water. ' +
+      'However, the behaviour also takes place in warm water and is also observed in birds that do not typically stand in water. ' +
+      'An alternative theory is that standing on one leg reduces the energy expenditure for producing muscular effort to ' +
+      'stand and balance on one leg. A study on cadavers showed that the one-legged pose could be held without any ' +
+      'muscle activity, while living flamingos demonstrate substantially less body sway in a one-legged posture. ' +
+      'As well as standing in the water, flamingos may stamp their webbed feet in the mud to stir up food from the bottom. ' +
+      'Flamingos are capable flyers, and flamingos in captivity often require wing clipping to prevent escape. ' +
+      'A pair of African flamingos which had not yet had their wings clipped escaped from the Wichita, Kansas zoo in 2005. ' +
+      'One was spotted in Texas 14 years later. Young flamingos hatch with grayish-red plumage, but adults range from ' +
+      'light pink to bright red due to aqueous bacteria and beta-carotene obtained from their food supply. A well-fed, ' +
+      'healthy flamingo is more vibrantly colored, thus a more desirable mate; a white or pale flamingo, however, is usually ' +
+      'unhealthy or malnourished. Captive flamingos are a notable exception; they may turn a pale pink if they are not fed ' +
+      'carotene at levels comparable to the wild. Flamingoes can open their bills by raising the upper jaw as well as by ' +
+      'dropping the lower.' +
+      'Flamingos usually stand on one leg, with the other being tucked beneath the body. ' +
       'The reason for this behaviour is not fully understood. One theory is that standing on one leg allows the ' +
       'birds to conserve more body heat, given that they spend a significant amount of time wading in cold water. ' +
       'However, the behaviour also takes place in warm water and is also observed in birds that do not typically stand in water. ' +

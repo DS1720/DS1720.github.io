@@ -1,7 +1,15 @@
 /*
 -------------
     Errors
+  --pronunciation-color: #ffd500;
+  --grammar-color: #ec7134;
+  --wordchoice-color: #ff009b;
+  --tense-color: #ea2828;
 -------------
+ */
+
+/*
+  Colors
  */
 
 :root :host /deep/ {
@@ -9,6 +17,9 @@
   --grammar-color: #C8963E;
   --wordchoice-color: #032340;
   --tense-color: #7C9EB2;
+  --delete-color: black;
+  --edit-color: black;
+  --save-color: black;
   --record-start: #86BA90;
   --record-hover: #628869;
   --record-hover-active: #ae4946;
@@ -16,29 +27,67 @@
 
 }
 
-/*all spans*/
-:host /deep/ .generalError, .pronunciation, .grammar, .wordchoice, .tense {
+/*
+  Error spans
+  */
+:host /deep/ .pronunciation, .grammar, .wordchoice, .tense, .delete, .edit {
   display: inline-block;
 }
 
-:host /deep/ span .pronunciation {
+:host /deep/ span.pronunciation, span.grammar, span.wordchoice, span.tense, span.delete, span.edit  {
+
+}
+
+:host /deep/ span.pronunciation {
+  border-top: 2px solid var(--pronunciation-color);
   border-bottom: 2px solid var(--pronunciation-color);
-  display: inline-block;
 }
 
-:host /deep/ span .grammar {
+:host /deep/ span.pronunciation.right {
+  border-right: 2px solid var(--pronunciation-color);
+}
+
+:host /deep/ span.pronunciation.left {
+  border-left: 2px solid var(--pronunciation-color);
+}
+
+:host /deep/ span.grammar {
+  border-top: 2px solid var(--grammar-color);
   border-bottom: 2px solid var(--grammar-color);
-  display: inline-block;
 }
 
-:host /deep/ span .wordchoice {
+:host /deep/ span.grammar.right {
+  border-right: 2px solid var(--grammar-color);
+}
+
+:host /deep/ span.grammar.left {
+  border-left: 2px solid var(--grammar-color);
+}
+
+:host /deep/ span.wordchoice {
+  border-top: 2px solid var(--wordchoice-color);
   border-bottom: 2px solid var(--wordchoice-color);
-  display: inline-block;
 }
 
-:host /deep/ span .tense {
+:host /deep/ span.wordchoice.right {
+  border-right: 2px solid var(--wordchoice-color);
+}
+
+:host /deep/ span.wordchoice.left {
+  border-left: 2px solid var(--wordchoice-color);
+}
+
+:host /deep/ span.tense {
+  border-top: 2px solid var(--tense-color);
   border-bottom: 2px solid var(--tense-color);
-  display: inline-block;
+}
+
+:host /deep/ span.tense.right {
+  border-right: 2px solid var(--tense-color);
+}
+
+:host /deep/ span.tense.left {
+  border-left: 2px solid var(--tense-color);
 }
 
 button.pronunciation {
@@ -57,6 +106,17 @@ button.tense {
   background-image: linear-gradient(to right, white 50%, var(--tense-color) 50%);
 }
 
+button.delete {
+  background-image: linear-gradient(to right, white 50%, var(--delete-color) 50%);
+}
+
+button.edit {
+  background-image: linear-gradient(to right, white 50%, var(--edit-color) 50%);
+}
+
+button.save {
+  background-image: linear-gradient(to right, white 50%, var(--save-color) 50%);
+}
 
 .student-errors-container button {
   background-size: 200% 100%;
@@ -75,6 +135,42 @@ button.tense {
   color: white;
 }
 
+/*
+  Grid/Flexbox Styles
+ */
+
+#grid {
+  display: grid;
+  grid-template-columns: 70% 30%;
+  height: 100%;
+  width: 100%;
+}
+
+/*
+  Left Side
+ */
+
+.properties-container {
+  display: grid;
+  min-height: 0;
+  grid-template-rows: 7em minmax(0, 1fr);
+  padding: 1rem;
+}
+
+/*
+  Student Properties Container
+ */
+
+.student-properties-container {
+  display: grid;
+  grid-template-columns: 70% 30%;
+  align-items: center;
+}
+
+/*
+  Record Button
+ */
+
 .student-properties-container .record-button {
   display: flex;
   flex-direction: column;
@@ -82,62 +178,45 @@ button.tense {
   text-align: center;
 }
 
-mat-icon {
-}
-
-.student-properties-container button {
-  border-radius: 50%;
+.student-properties-container .record-button button {
   width: 2.5em;
   height: 2.5em;
   border: 0;
   color: black;
+  text-align: center;
+  border-radius: 5px;
+  outline: none;
+  font-size: 1.5em;
   background-color: var(--record-start);
 }
 
-.student-properties-container button.active{
+.student-properties-container .record-button button.active{
   background-color: var(--record-end);
 }
 
-.student-properties-container button:hover{
+.student-properties-container .record-button button:hover{
   background-color: var(--record-hover);
 }
 
-.student-properties-container button.active:hover{
+.student-properties-container .record-button button.active:hover{
   background-color: var(--record-hover-active);
 }
 
-.student-properties-container button span {
+.student-properties-container .record-button button span {
   font-size: .7em;
 }
 
-
 /*
---------------------
-    Error-Buttons
---------------------
+  Transcript
  */
 
-#grid {
-  display: grid;
-  grid-template-columns: 2fr 3fr;
-  height: 100%;
-  width: 100%;
-}
-
-:host /deep/ .transcript-error-container {
-  display: grid;
-  grid-template-rows: minmax(0,1fr) 150px;
-  min-height: 0;
-}
-
-:host /deep/ .transcript-container {
+.transcript-container {
   display: flex;
   flex-direction: column;
 }
 
 .transcript-container label {
   margin-top: 1rem;
-  margin-left: 1rem;
 }
 
 :host /deep/ #full-transcript {
@@ -145,33 +224,38 @@ mat-icon {
   overflow-y: auto;
   background-color: white;
   padding: 1em 1em 1em 1em;
-  margin: 0rem 1rem 0rem 1rem;
+  margin: 0rem 1rem 0rem 0rem;
   font-size: 1.3em;
   border: solid 1px #333;
   border-radius: 5px;
   line-height: 1.3em;
 }
 
-:host /deep/ .transcipt {
+.transcipt {
   white-space: pre-wrap;
 }
 
+/*
+  Right Side
+ */
+
 .student-errors-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  grid-template-rows: repeat(auto-fill, 1fr);
-  column-gap: 10px;
-  row-gap: 10px;
-  margin: 1rem;
-  align-items: center;
-  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  margin-top: 1rem;
 }
 
-.error-item {
+/*
+  Error Buttons
+ */
+
+.error-item, .student-errors-container .split-buttons {
   height: 100%;
+  margin-bottom: 1rem;
+  margin-right: 1rem;
 }
 
-button {
+.student-errors-container button, .student-errors-container .split-buttons button {
   padding-left: 20px;
   border: solid 1px #333;
   border-radius: 5px;
@@ -179,20 +263,28 @@ button {
   width: 100%;
   height: 100%;
   font-size: 1.5em;
+  overflow-x: hidden;
 }
 
-.properties-container {
-  display: grid;
-  min-height: 0;
-  grid-template-rows: 100px minmax(0, 1fr) 100px;
-  padding: 1rem;
+/*
+  Splitted Buttons
+ */
+
+.student-errors-container .split-buttons {
+  display: flex;
 }
 
-.student-properties-container {
-  display: grid;
-  grid-template-columns: 70% 30%;
-  align-items: center;
+.split-buttons button:first-child {
+  margin-right: .5rem;
 }
+
+.split-buttons button:last-child {
+  margin-left: .5rem;
+}
+
+/*
+  Not used
+ */
 
 .notes-container {
   display: flex;

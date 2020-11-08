@@ -5,6 +5,7 @@ import { MaterialModule } from '../shared/material/material.module';
 import {SharedModule} from '../shared/shared.module';
 import {FormsModule} from '@angular/forms';
 import {MatTooltipModule} from '@angular/material/tooltip';
+import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 
 
 @NgModule({
@@ -17,7 +18,8 @@ import {MatTooltipModule} from '@angular/material/tooltip';
         MaterialModule,
         SharedModule,
         FormsModule,
-        MatTooltipModule
+        MatTooltipModule,
+        FontAwesomeModule
     ]
 })
 export class WebSpeechModule { }

@@ -32,6 +32,8 @@ export class StudentError {
       const tempError = errors.filter(x => x.getId() === tempId)[0];
       if (tempError) {
         tempError.setEndIndex(beginIndex + length + 1);
+        tempError.setText(text.substr(tempError.getStartIndex(), tempError.getEndIndex() - tempError.getStartIndex()));
+        tempError.setOffsetBack(tempError.getText().length - tempError.getText().lastIndexOf('<'));
       }
     }
     return errors;
@@ -48,10 +50,11 @@ export class StudentError {
     const startIndexType = text.search('type="') + 6;
     const typeLength = text.substr(startIndexType).search('"');
     const type = text.substr(startIndexType, typeLength);
-    return new StudentError(id, type, startIndex, -1);
+    console.log(text);
+    return new StudentError(id, type, startIndex, -1, '', text.length, -1);
   }
 
-  constructor(private id: number, private type: string, private startIndex: number, private endIndex: number) {
+  constructor(private id: number, private type: string, private startIndex: number, private endIndex: number, private text: string, private offsetFront: number, private offsetBack: number) {
   }
   getId(): number {
     return this.id;
@@ -67,5 +70,20 @@ export class StudentError {
   }
   setEndIndex(index: number): void {
     this.endIndex = index;
+  }
+  setText(text: string): void {
+    this.text = text;
+  }
+  getText(): string {
+    return this.text;
+  }
+  getOffsetFront(): number {
+    return this.offsetFront;
+  }
+  getOffsetBack(): number {
+    return this.offsetBack;
+  }
+  setOffsetBack(offsetBack: number): void {
+    this.offsetBack = offsetBack;
   }
 }
