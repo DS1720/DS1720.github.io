@@ -30,17 +30,11 @@
 /*
   Error spans
   */
-:host /deep/ .pronunciation, .grammar, .wordchoice, .tense, .delete, .edit {
-  display: inline-block;
-}
-
-:host /deep/ span.pronunciation, span.grammar, span.wordchoice, span.tense, span.delete, span.edit  {
-
-}
 
 :host /deep/ span.pronunciation {
   border-top: 2px solid var(--pronunciation-color);
   border-bottom: 2px solid var(--pronunciation-color);
+  display: inline-block;
 }
 
 :host /deep/ span.pronunciation.right {
@@ -54,6 +48,7 @@
 :host /deep/ span.grammar {
   border-top: 2px solid var(--grammar-color);
   border-bottom: 2px solid var(--grammar-color);
+  display: inline-block;
 }
 
 :host /deep/ span.grammar.right {
@@ -67,6 +62,7 @@
 :host /deep/ span.wordchoice {
   border-top: 2px solid var(--wordchoice-color);
   border-bottom: 2px solid var(--wordchoice-color);
+  display: inline-block;
 }
 
 :host /deep/ span.wordchoice.right {
@@ -80,6 +76,7 @@
 :host /deep/ span.tense {
   border-top: 2px solid var(--tense-color);
   border-bottom: 2px solid var(--tense-color);
+  display: inline-block;
 }
 
 :host /deep/ span.tense.right {
