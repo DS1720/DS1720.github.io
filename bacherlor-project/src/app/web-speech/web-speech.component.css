@@ -115,19 +115,19 @@ button.save {
   background-image: linear-gradient(to right, white 50%, var(--save-color) 50%);
 }
 
-.student-errors-container button {
+.student-annotations-container button {
   background-size: 200% 100%;
   background-repeat: repeat-x;
   background-position: -10% 100%;
   transition: background-position 0.5s, color 0.5s;
 }
 
-.student-errors-container button:hover {
+.student-annotations-container button:hover {
   background-position: -90%;
   color: white;
 }
 
-.student-errors-container button.active {
+.student-annotations-container button.active {
   background-position: -100%;
   color: white;
 }
@@ -236,7 +236,7 @@ button.save {
   Right Side
  */
 
-.student-errors-container {
+.student-annotations-container {
   display: flex;
   flex-direction: column;
   margin-top: 1rem;
@@ -246,13 +246,13 @@ button.save {
   Error Buttons
  */
 
-.error-item, .student-errors-container .split-buttons {
+.error-item, .student-annotations-container .split-buttons {
   height: 100%;
   margin-bottom: 1rem;
   margin-right: 1rem;
 }
 
-.student-errors-container button, .student-errors-container .split-buttons button {
+.student-annotations-container button, .student-annotations-container .split-buttons button {
   padding-left: 20px;
   border: solid 1px #333;
   border-radius: 5px;
@@ -267,7 +267,7 @@ button.save {
   Splitted Buttons
  */
 
-.student-errors-container .split-buttons {
+.student-annotations-container .split-buttons {
   display: flex;
 }
 

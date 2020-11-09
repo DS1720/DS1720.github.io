@@ -30,14 +30,14 @@
 
     </section>
   </div>
-  <section class="student-errors-container">
-      <div class="error-item" *ngFor="let error of errorTypes">
-        <button [class.active]="error==activeErrorType" class="{{error.split(' ').join('')}}"
-                (click)="changeErrorType(error)">{{error}}</button>
+  <section class="student-annotations-container">
+      <div class="error-item" *ngFor="let annotation of annotationTypes">
+        <button [class.active]="annotation==activeAnnotationType" class="{{annotation.split(' ').join('')}}"
+                (click)="changeErrorType(annotation)">{{annotation}}</button>
       </div>
       <div class="split-buttons">
-        <button class="delete" [class.active]="'delete'==activeErrorType" (click)="changeErrorType('delete')">Delete Error</button>
-        <button class="edit" [class.active]="'edit'==activeErrorType" (click)="changeErrorType('edit')">Edit Text</button>
+        <button class="delete" [class.active]="'delete'==activeAnnotationType" (click)="changeErrorType('delete')">Delete Error</button>
+        <button class="edit" [class.active]="'edit'==activeAnnotationType" (click)="changeErrorType('edit')">Edit Text</button>
       </div>
       <div class="split-buttons">
         <button class="save">Save</button>

@@ -1,5 +1,5 @@
 import {Pipe, PipeTransform} from '@angular/core';
-import {StudentError} from '../../Entities/student-error';
+import {Annotation} from '../../Entities/annotation';
 import {split} from 'ts-node';
 
 @Pipe({
@@ -13,7 +13,7 @@ export class TranscriptFormatPipe implements PipeTransform {
    */
   transform(transcript: string): string {
     // get all errors
-    const errors = StudentError.getErrorsFromString(transcript);
+    const errors = Annotation.getAnnotationsFromString(transcript);
     // get spans
     const spans = this.getSpans(errors);
     // insert start and end spans separately with span type and side as class
@@ -34,7 +34,7 @@ export class TranscriptFormatPipe implements PipeTransform {
    * @param index where insertedText is inserted
    * @return processed string
    */
-  insertIntoText(originalText: string, insertedText: string, index: number): string {
+  private insertIntoText(originalText: string, insertedText: string, index: number): string {
     return [originalText.slice(0, index), insertedText, originalText.slice(index)].join('');
   }
 
@@ -42,7 +42,7 @@ export class TranscriptFormatPipe implements PipeTransform {
    * returns spans in order from back to front
    * @param errors made in the text
    */
-  getSpans(errors: StudentError[]): { index: number, type?: string, id: number, start: boolean, side: string }[] {
+  private getSpans(errors: Annotation[]): { index: number, type?: string, id: number, start: boolean, side: string }[] {
     const spans: {index: number, type?: string, id: number, start: boolean, side: string}[] = [];
     // insert a span for every word in error
     for (const studentError of errors) {
@@ -116,7 +116,7 @@ export class TranscriptFormatPipe implements PipeTransform {
             side: ''
           });
         }
-        //add processed Text to current Index
+        // add processed Text to current Index
         currentIndex += originalTextFragment.length;
       }
       // if only one word was processed add left and right border

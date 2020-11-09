@@ -1,24 +1,24 @@
-export class StudentError {
+export class Annotation {
   /**
-   * returns new errorId
-   * @param errorArray of already existing errors
+   * returns new annotationId
+   * @param annotationArray of already existing annotations
    */
-  static getNewId(errorArray: StudentError[]): number {
+  static getNewId(annotationArray: Annotation[]): number {
     let highestId = -1;
-    for (const error of errorArray) {
-      if (error.getId() > highestId) {
-        highestId = error.getId();
+    for (const annotation of annotationArray) {
+      if (annotation.getId() > highestId) {
+        highestId = annotation.getId();
       }
     }
     return highestId + 1;
   }
 
   /**
-   * returns Errors from String
-   * errors have to first have a starting tag and then an ending tag
-   * @param text with inserted Errors
+   * returns Annotations from String
+   * annotations have to first have a starting tag and then an ending tag
+   * @param text with inserted Annotations
    */
-  static getErrorsFromString(text: string): StudentError[] {
+  static getAnnotationsFromString(text: string): Annotation[] {
     const errors = [];
     let regex = /<error id="\d*" type="\w*"\/>/;
     let tempIndex = text.search(regex);
@@ -31,7 +31,7 @@ export class StudentError {
       offset = offset + tempIndex + 1;
       tempIndex = text.substr(offset).search(regex);
       // push found error
-      errors.push(this.getErrorFromString(text.substr(beginIndex, endIndex - beginIndex + 1), beginIndex));
+      errors.push(this.getAnnotationFromString(text.substr(beginIndex, endIndex - beginIndex + 1), beginIndex));
     }
     regex = /<error id="\d*"\/>/;
     offset = 0;
@@ -60,33 +60,33 @@ export class StudentError {
    * returns the id from an error tag
    * @param text of error tag
    */
-  static getIdFromString(text: string): number {
+  private static getIdFromString(text: string): number {
     const startIndexId = text.search('id="') + 4;
     const idLength = text.substr(startIndexId).search('"');
     return +text.substr(startIndexId, idLength);
   }
 
   /**
-   * return an error from a start tag
+   * return an annotation from a start tag
    * fills start index and type, endIndex -1, text '', offsetBack -1
-   * @param text of error
-   * @param startIndex of created error
+   * @param text of annotation
+   * @param startIndex of created annotation
    */
-  static getErrorFromString(text: string, startIndex: number): StudentError {
+  private static getAnnotationFromString(text: string, startIndex: number): Annotation {
     const id = this.getIdFromString(text);
     const startIndexType = text.search('type="') + 6;
     const typeLength = text.substr(startIndexType).search('"');
     const type = text.substr(startIndexType, typeLength);
-    return new StudentError(id, type, startIndex, -1, '', text.length, -1);
+    return new Annotation(id, type, startIndex, -1, '', text.length, -1);
   }
 
   /**
-   * constructor of studenError
-   * @param id of studentError
-   * @param type of studentError
-   * @param startIndex of studentError
-   * @param endIndex of studentError
-   * @param text of studentError
+   * constructor of Annotation
+   * @param id of Annotation
+   * @param type of Annotation
+   * @param startIndex of Annotation
+   * @param endIndex of Annotation
+   * @param text of Annotation
    * @param offsetFront is length of front tag
    * @param offsetBack is length of end tag
    */

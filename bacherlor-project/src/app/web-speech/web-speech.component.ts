@@ -7,8 +7,8 @@ import { SpeechEvent } from '../shared/model/speech-event';
 import { SpeechRecognizerService } from '../shared/services/web-apis/speech-recognizer.service';
 import { ActionContext } from '../shared/services/actions/action-context';
 import { SpeechNotification } from '../shared/model/speech-notification';
-import {StudentError} from '../shared/Entities/student-error';
-import {StudentErrorType} from '../shared/Entities/student-error-type.enum';
+import {Annotation} from '../shared/Entities/annotation';
+import {StudentErrorType} from '../shared/Entities/annotation-type';
 import { faMicrophone } from '@fortawesome/free-solid-svg-icons';
 import { faMicrophoneSlash } from '@fortawesome/free-solid-svg-icons';
 
@@ -30,8 +30,8 @@ export class WebSpeechComponent implements OnInit {
   isListening = false;
   errorMessage$?: Observable<string>;
   defaultError$ = new Subject<string | undefined>();
-  errorTypes: string[] = [];
-  activeErrorType = '';
+  annotationTypes: string[] = [];
+  activeAnnotationType = '';
   activeStudent = {id: 1, name: 'John Doe', course: 'Technical English Communication A'};
   exam = {name: 'Mid Term 2020S', maxPoints: 100, reachedPoints: 0};
   tempTranscript = 'init';
@@ -82,14 +82,14 @@ export class WebSpeechComponent implements OnInit {
       this.errorMessage$ = of('Your Browser is not supported. Please try Google Chrome.');
     }
     for (const error of Object.keys(StudentErrorType)) {
-      this.errorTypes.push(error);
+      this.annotationTypes.push(error);
     }
-    this.activeErrorType = this.errorTypes[0];
+    this.activeAnnotationType = this.annotationTypes[0];
   }
 
   // changes type of error
   changeErrorType(type: string): void {
-    this.activeErrorType = type;
+    this.activeAnnotationType = type;
   }
 
   /**
@@ -115,14 +115,23 @@ export class WebSpeechComponent implements OnInit {
         globalIndexes = this.getGlobalIndex(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
       }
       // if error type is selected save error
-      if (this.activeErrorType !== 'delete' && this.activeErrorType !== 'edit') {
-        this.saveAnnotation(globalIndexes[0], globalIndexes[1], this.activeErrorType.split(' ').join(''));
-      } else if (this.activeErrorType === 'delete') {
-        // delete error
-      } else if (this.activeErrorType === 'edit') {
+      if (this.activeAnnotationType !== 'delete' && this.activeAnnotationType !== 'edit') {
+        this.saveAnnotation(globalIndexes[0], globalIndexes[1], this.activeAnnotationType.split(' ').join(''));
+      } else if (this.activeAnnotationType === 'delete') {
+        globalIndexes = this.transformIndexesToOffset(globalIndexes);
+        this.deleteNextAnnotationInTranscript(globalIndexes[0], globalIndexes[1]);
+      } else if (this.activeAnnotationType === 'edit') {
         // edit marked text
       }
     }
+  }
+
+  /**
+   * returns Transcript without annotationTags
+   * @private
+   */
+  private getTranscriptWithoutTags(): string {
+    return this.totalTranscript.replace(/<[^>]+>/g, '');
   }
 
   /**
@@ -130,7 +139,7 @@ export class WebSpeechComponent implements OnInit {
    * @param text of analyzed string
    * @param charIndex of selected char
    */
-  getWordIndexByChar(text: string | null, charIndex: number): number[] {
+  private getWordIndexByChar(text: string | null, charIndex: number): number[] {
     if (text === null) {
       return [-1, -1];
     }
@@ -156,7 +165,7 @@ export class WebSpeechComponent implements OnInit {
    * @param endContainer of selected word
    * @param end index
    */
-  getGlobalIndex(startContainer: Node, start: number, endContainer: Node, end: number): number[] {
+  private getGlobalIndex(startContainer: Node, start: number, endContainer: Node, end: number): number[] {
     const indexesFront = this.getIndicesBefore(startContainer);
     const indexesBack = this.getIndicesBefore(endContainer);
     return [indexesFront + start, indexesBack + end];
@@ -166,7 +175,7 @@ export class WebSpeechComponent implements OnInit {
    * returns index of char at the start of parent Node
    * @param node that was clicked
    */
-  getIndicesBefore(node: Node): number {
+  private getIndicesBefore(node: Node): number {
     let currentNode = node;
     let indexesFront = 0;
     while (currentNode !== null && (currentNode.previousSibling !== null ||
@@ -185,13 +194,13 @@ export class WebSpeechComponent implements OnInit {
   }
 
   /**
-   * saves error annotation
+   * saves annotation
    * @param start index
    * @param end index
-   * @param annotationType of error
+   * @param annotationType
    */
-  saveAnnotation(start: number, end: number, annotationType: string): void {
-    const newId = StudentError.getNewId(StudentError.getErrorsFromString(this.totalTranscript));
+  private saveAnnotation(start: number, end: number, annotationType: string): void {
+    const newId = Annotation.getNewId(Annotation.getAnnotationsFromString(this.totalTranscript));
     this.insertIntoTranscript(end, `<error id="${newId}"/>`);
     this.insertIntoTranscript(start, `<error id="${newId}" type="${annotationType}"/>`);
   }
@@ -201,7 +210,7 @@ export class WebSpeechComponent implements OnInit {
    * @param index insertion
    * @param text that is inserted
    */
-  insertIntoTranscript(index: number, text: string): void {
+  private insertIntoTranscript(index: number, text: string): void {
     let counter = 0;
     let inTag = false;
     let totalIndex = 0;
@@ -220,6 +229,102 @@ export class WebSpeechComponent implements OnInit {
   }
 
   /**
+   * calculates Indexes with annotation tags
+   * precondition = indexes[0] < indexes[1]
+   * @param indexes without annotation tags
+   * @return indexes with annotation tags
+   * @private
+   */
+  private transformIndexesToOffset(indexes: number[]): number[] {
+    const tempIndexes = [-1, -1];
+    let offset = 0;
+    let inTag = false;
+    let firstIndexCalculated = false;
+    // count offset++ if inTag or at end from tag
+    for (let i = 0; i - offset <= indexes[1]; i++) {
+      // if position in text minus calculated offset is bigger than first index -> recalculate index
+      if (i - offset >= indexes[0] && !firstIndexCalculated) {
+        tempIndexes[0] = indexes[0] + offset;
+        console.log('Here');
+        firstIndexCalculated = true;
+      }
+      if (this.totalTranscript[i] === '<') {
+        inTag = true;
+      } else if (this.totalTranscript[i] === '>') {
+        inTag = false;
+        offset++;
+      }
+      if (inTag) {
+        offset++;
+      }
+    }
+    // recalculate index 2
+    tempIndexes[1] = indexes[1] + offset;
+    return tempIndexes;
+  }
+
+  /**
+   * deletes all Annotations that start or end inside the Indexes.
+   * if no annotation is inside it deletes annotation that starts nearest at intervall and doesn't end before endIndex
+   * @param startIndex of user selection
+   * @param endIndex of user selection
+   */
+  private deleteNextAnnotationInTranscript(startIndex: number, endIndex: number): void {
+    const currentAnnotations = Annotation.getAnnotationsFromString(this.totalTranscript);
+    const deleteAnnotations: Annotation[] = [];
+    const deleteAnnotationsFurther: Annotation[] = [];
+    console.log(startIndex, endIndex);
+    console.log(currentAnnotations);
+    // delete all annotations inside
+    for (const annotation of currentAnnotations) {
+      if (annotation.getStartIndex() >= startIndex && annotation.getEndIndex() <= endIndex) {
+        deleteAnnotations.push(annotation);
+      }
+      if (annotation.getStartIndex() <= startIndex && annotation.getEndIndex() >= endIndex) {
+        deleteAnnotationsFurther.push(annotation);
+      }
+    }
+    if (deleteAnnotations.length !== 0) {
+      this.deleteAnnotationsFromTranscript(deleteAnnotations);
+    } else {
+      this.deleteAnnotationsFromTranscript(deleteAnnotationsFurther);
+    }
+  }
+
+  /**
+   * delete annotations from Transcript
+   * @param annotations that should be deleted from Transcript
+   */
+  private deleteAnnotationsFromTranscript(annotations: Annotation[]): void {
+    if (annotations.length <= 0) { return; }
+    const deleteIndexes: {startIndex: number, endIndex: number}[] = [];
+    annotations.forEach(annotation => {
+      deleteIndexes.push({
+        startIndex: annotation.getStartIndex() + annotation.getText().length - annotation.getOffsetBack(),
+        endIndex: annotation.getStartIndex() + annotation.getText().length
+      });
+      deleteIndexes.push({
+        startIndex: annotation.getStartIndex(),
+        endIndex: annotation.getStartIndex() + annotation.getOffsetFront()
+      });
+    });
+    deleteIndexes.sort((a, b) => {
+      return a.startIndex > b.startIndex ? -1 : a.startIndex < b.startIndex ? 1 : 0;
+    });
+    deleteIndexes.forEach(index => this.deleteFromTranscript(index.startIndex, index.endIndex));
+  }
+
+  /**
+   * deletes from Transcript
+   * @param startIndex of first letter deleted
+   * @param endIndex of last letter deleted
+   */
+  private deleteFromTranscript(startIndex: number, endIndex: number): void {
+    this.totalTranscript = this.totalTranscript.substr(0, startIndex) +
+        this.totalTranscript.substr(endIndex);
+  }
+
+  /**
    * toggles between listening and not listening
    */
   toogleListening(): void {
@@ -234,7 +339,7 @@ export class WebSpeechComponent implements OnInit {
    * starts transcript recording when not recording
    * ends recording if already recording
    */
-  start(): void {
+  private start(): void {
     if (this.speechRecognizer.isListening) {
       this.stop();
       return;
@@ -248,7 +353,7 @@ export class WebSpeechComponent implements OnInit {
   /**
    * stops recording of transcript
    */
-  stop(): void {
+  private stop(): void {
     this.speechRecognizer.stop();
     this.isListening = false;
   }
