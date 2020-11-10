@@ -17,6 +17,7 @@
   --grammar-color: #C8963E;
   --wordchoice-color: #032340;
   --tense-color: #7C9EB2;
+  --positive-color: #1f672e;
   --delete-color: black;
   --edit-color: black;
   --save-color: black;
@@ -87,49 +88,18 @@
   border-left: 2px solid var(--tense-color);
 }
 
-button.pronunciation {
-  background-image: linear-gradient(to right, white 50%, var(--pronunciation-color) 50%);
+:host /deep/ span.positive {
+  border-top: 2px solid var(--positive-color);
+  border-bottom: 2px solid var(--positive-color);
+  display: inline-block;
 }
 
-button.grammar {
-  background-image: linear-gradient(to right, white 50%, var(--grammar-color) 50%);
+:host /deep/ span.positive.right {
+  border-right: 2px solid var(--positive-color);
 }
 
-button.wordchoice {
-  background-image: linear-gradient(to right, white 50%, var(--wordchoice-color) 50%);
-}
-
-button.tense {
-  background-image: linear-gradient(to right, white 50%, var(--tense-color) 50%);
-}
-
-button.delete {
-  background-image: linear-gradient(to right, white 50%, var(--delete-color) 50%);
-}
-
-button.edit {
-  background-image: linear-gradient(to right, white 50%, var(--edit-color) 50%);
-}
-
-button.save {
-  background-image: linear-gradient(to right, white 50%, var(--save-color) 50%);
-}
-
-.student-annotations-container button {
-  background-size: 200% 100%;
-  background-repeat: repeat-x;
-  background-position: -10% 100%;
-  transition: background-position 0.5s, color 0.5s;
-}
-
-.student-annotations-container button:hover {
-  background-position: -90%;
-  color: white;
-}
-
-.student-annotations-container button.active {
-  background-position: -100%;
-  color: white;
+:host /deep/ span.positive.left {
+  border-left: 2px solid var(--positive-color);
 }
 
 /*
@@ -150,8 +120,12 @@ button.save {
 .properties-container {
   display: grid;
   min-height: 0;
-  grid-template-rows: 7em minmax(0, 1fr);
-  padding: 1rem;
+  grid-template-rows: 7em minmax(0, 1fr) 12em;
+  padding: 0rem 1rem 1rem 1rem;
+}
+
+.properties-container section {
+  margin-top: 1rem;
 }
 
 /*
@@ -232,6 +206,37 @@ button.save {
   white-space: pre-wrap;
 }
 
+.temporaryText {
+  color: grey;
+}
+
+/*
+  Notes
+ */
+
+.notes {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+#notes-container {
+  flex: 1;
+  margin-bottom: 1rem;
+  margin-right: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+textarea.notes-text-container {
+  overflow-y: auto;
+  resize: none;
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 1em;
+  height: 100%;
+}
+
 /*
   Right Side
  */
@@ -240,6 +245,7 @@ button.save {
   display: flex;
   flex-direction: column;
   margin-top: 1rem;
+  margin-right: 1rem;
 }
 
 /*
@@ -250,6 +256,8 @@ button.save {
   height: 100%;
   margin-bottom: 1rem;
   margin-right: 1rem;
+  width: 100%;
+  display: flex;
 }
 
 .student-annotations-container button, .student-annotations-container .split-buttons button {
@@ -257,18 +265,87 @@ button.save {
   border: solid 1px #333;
   border-radius: 5px;
   outline: none;
-  width: 100%;
   height: 100%;
   font-size: 1.5em;
   overflow-x: hidden;
+}
+
+.student-annotations-container .error-item button:first-child {
+  width: 70%;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+  border-right: 0 solid;
+  display: flex;
+  align-items: center;
+}
+
+.student-annotations-container .error-item button:first-child div:first-child {
+  width: 70%;
+}
+
+.student-annotations-container .error-item button:first-child div:last-child {
+  width: 30%;
+}
+
+.student-annotations-container .error-item button:last-child {
+  width: 30%;
+  padding-left: 0px;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+  background-image: linear-gradient(to right, white 50%, var(--positive-color) 50%);
+}
+
+button.pronunciation {
+  background-image: linear-gradient(to right, white 50%, var(--pronunciation-color) 50%);
+}
+
+button.grammar {
+  background-image: linear-gradient(to right, white 50%, var(--grammar-color) 50%);
+}
+
+button.wordchoice {
+  background-image: linear-gradient(to right, white 50%, var(--wordchoice-color) 50%);
+}
+
+button.tense {
+  background-image: linear-gradient(to right, white 50%, var(--tense-color) 50%);
+}
+
+button.delete {
+  background-image: linear-gradient(to right, white 50%, var(--delete-color) 50%);
+}
+
+button.edit {
+  background-image: linear-gradient(to right, white 50%, var(--edit-color) 50%);
+}
+
+button.save {
+  background-image: linear-gradient(to right, white 50%, var(--save-color) 50%);
+}
+
+.student-annotations-container button {
+  background-size: 200% 100%;
+  background-repeat: repeat-x;
+  background-position: 20px 100%;
+  transition: background-position 0.5s, color 0.5s;
+}
+
+.student-annotations-container button:hover {
+  background-position: calc(-100% - 20px);
+  color: white;
+}
+
+.student-annotations-container button.active {
+  background-position: -100%;
+  color: white;
 }
 
 /*
   Splitted Buttons
  */
 
-.student-annotations-container .split-buttons {
-  display: flex;
+.student-annotations-container .split-buttons button {
+  width: 100%;
 }
 
 .split-buttons button:first-child {
@@ -280,114 +357,63 @@ button.save {
 }
 
 /*
-  Not used
+  Edit Container
  */
+.popup {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255,255,255,.3);
+}
 
-.notes-container {
+.edit-transcript-container {
   display: flex;
   flex-direction: column;
-}
-
-.notes-flex-item {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.notes-flex-item textarea {
-  flex-grow: 1;
-}
-
-.notes-container label {
-  margin-top: 20px;
-}
-
-.notes-container textarea {
-  resize: none;
-  overflow-y: scroll;
-}
-
-.points-container {
-  display: grid;
-  grid-template-columns: 50% 50%;
-  min-height: 0;
-  min-width: 0;
-  overflow-y: hidden;
-  align-items: center;
-  font-size: 1em;
-}
-
-.points-container .flex-container-points {
-  display: flex;
   justify-content: center;
-  font-size: 1.5em;
+  align-items: center;
 }
 
-.points-container span {
+#edit-transcript {
   display: flex;
-  flex-grow: 0;
-  white-space: pre;
+  flex-direction: column;
+  max-width: 1000px;
+  width: calc(100% - 6em);
+  max-height: 500px;
+  height: calc(100% - 6em);
+  flex: 1;
+  background-color: white;
+  padding: 1em 1em 1em 1em;
+  font-size: 1.3em;
+  border: solid 1px #333;
+  border-radius: 5px;
+  line-height: 1.3em;
 }
 
-.points-container div {
-  text-align: center;
-}
-
-.points-container input {
-  display: flex;
-  flex-grow: 1;
-  outline: none;
-  border: none;
-  min-width: 10px;
-  max-width: 50px;
-  border-bottom: 1px black solid;
-  text-align: right;
+textarea.edit-transcript-text-container {
+  height: calc(100% - 2rem);
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+  flex-direction: column;
+  overflow-y: auto;
+  resize: none;
+  border: 1px solid black;
+  border-radius: 5px;
+  width: calc(100% - 2em);
+  padding: 1em;
 }
 
 .button-row {
-  font-size: 1em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  text-align: right;
 }
 
 .button-row button {
-  margin: 0.5em;
-  min-height: 2em;
-  background-image: linear-gradient(to right, white 50%, black 50%);
-  background-size: 200% 100%;
-  background-repeat: repeat-x;
-  background-position: -10% 100%;
-  transition: background-position 0.5s, color 0.5s;
+  border: 0 solid;
+  font-size: 1.5em;
+  background: transparent;
 }
 
 .button-row button:hover {
-  background-position: -90%;
-  color: white;
+  color: rgb(96, 96, 96);
 }
-
-.button-row button.active {
-  background-position: -100%;
-  color: white;
-}
-
-.speech-result-width {
-  width: 100%;
-}
-
-textarea {
-  text-align: justify;
-  text-align-last: center;
-}
-
-section textarea {
-  border: solid 1px #333;
-  border-radius: 5px;
-  color: black;
-  background: white;
-}
-
-.temporaryText {
-  color: grey;
-}
-

@@ -2,6 +2,17 @@
   <mat-card *ngIf="errorMessage$| async as errorMessage" class="notification">{{errorMessage}}</mat-card>
 </section-->
 
+<section *ngIf="showEditPopup" class="edit-transcript-container popup">
+  <div id="edit-transcript">
+    <label for="edit-transcript">Edit Transcript</label>
+    <textarea class="edit-transcript-text-container" [(ngModel)]="textToEdit"></textarea>
+    <div class="button-row">
+      <button><fa-icon (click)="toogleEditPopup()" [icon]="faTimesCircle"></fa-icon></button>
+      <button><fa-icon (click)="confirmEditText()" [icon]="faCheckCircle"></fa-icon></button>
+    </div>
+  </div>
+</section>
+
 <div id="grid">
   <div class="properties-container">
     <section class="student-properties-container">
@@ -27,21 +38,32 @@
               [innerHTML]="totalTranscript | transcriptFormat"></span>
         <span class="temporaryText">{{transcript$ | async}}</span>
       </div>
-
+    </section>
+    <section class="notes">
+      <label for="notes-container">Notes for Feedback</label>
+      <div id="notes-container">
+        <textarea class="notes-text-container" [(ngModel)]="feedback"></textarea>
+      </div>
     </section>
   </div>
   <section class="student-annotations-container">
       <div class="error-item" *ngFor="let annotation of annotationTypes">
-        <button [class.active]="annotation==activeAnnotationType" class="{{annotation.split(' ').join('')}}"
-                (click)="changeErrorType(annotation)">{{annotation}}</button>
+        <button [class.active]="annotation==activeAnnotationType && !activeAnnotationPositive" class="{{annotation.split(' ').join('')}}"
+                (click)="changeErrorType(annotation); setActiveAnnotationPositive(false)">
+          <div>{{annotation}}</div>
+          <div>-</div></button>
+        <button [class.active]="annotation==activeAnnotationType && activeAnnotationPositive"
+                (click)="changeErrorType(annotation); setActiveAnnotationPositive(true)"
+                class="positive-annotation">
+          +</button>
       </div>
       <div class="split-buttons">
-        <button class="delete" [class.active]="'delete'==activeAnnotationType" (click)="changeErrorType('delete')">Delete Error</button>
+        <button class="delete" [class.active]="'delete'==activeAnnotationType" (click)="changeErrorType('delete')">Delete Annotation</button>
         <button class="edit" [class.active]="'edit'==activeAnnotationType" (click)="changeErrorType('edit')">Edit Text</button>
       </div>
       <div class="split-buttons">
-        <button class="save">Save</button>
-        <button class="save">Save & Exit</button>
+        <button class="save" (click)="saveFeedbackAndTranscript()">Save</button>
+        <button class="save" (click)="saveAndRouteToFeedback()">Save & Exit</button>
       </div>
   </section>
   <!--

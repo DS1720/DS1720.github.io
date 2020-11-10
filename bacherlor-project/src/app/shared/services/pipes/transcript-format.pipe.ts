@@ -18,8 +18,9 @@ export class TranscriptFormatPipe implements PipeTransform {
     const spans = this.getSpans(errors);
     // insert start and end spans separately with span type and side as class
     for (const span of spans) {
+      const positive = span.positive ? 'positive' : '';
       if (span.start === true) {
-        transcript = this.insertIntoText(transcript, `<span class="${span.type} ${span.side} tooltip">`, span.index);
+        transcript = this.insertIntoText(transcript, `<span class="${span.type} ${span.side} ${positive} tooltip">`, span.index);
       } else {
         transcript = this.insertIntoText(transcript, `</span>`, span.index);
       }
@@ -42,8 +43,8 @@ export class TranscriptFormatPipe implements PipeTransform {
    * returns spans in order from back to front
    * @param errors made in the text
    */
-  private getSpans(errors: Annotation[]): { index: number, type?: string, id: number, start: boolean, side: string }[] {
-    const spans: {index: number, type?: string, id: number, start: boolean, side: string}[] = [];
+  private getSpans(errors: Annotation[]): { index: number, type?: string, id: number, start: boolean, side: string, positive: boolean }[] {
+    const spans: {index: number, type?: string, id: number, start: boolean, side: string, positive: boolean}[] = [];
     // insert a span for every word in error
     for (const studentError of errors) {
       const originalText = studentError.getText();
@@ -91,8 +92,8 @@ export class TranscriptFormatPipe implements PipeTransform {
           }
         }
       }
-      const spansErrorStart: { index: number, type?: string, id: number, start: boolean, side: string }[] = [];
-      const spansErrorEnd: { index: number, type?: string, id: number, start: boolean, side: string }[] = [];
+      const spansErrorStart: { index: number, type?: string, id: number, start: boolean, side: string, positive: boolean }[] = [];
+      const spansErrorEnd: { index: number, type?: string, id: number, start: boolean, side: string, positive: boolean }[] = [];
       for (const originalTextFragment of splittedText) {
         // Start Tag
         const regexStart = /<error id="\d*" type="\w*"\/>/;
@@ -106,14 +107,16 @@ export class TranscriptFormatPipe implements PipeTransform {
             type: studentError.getType(),
             id: studentError.getId(),
             start: true,
-            side: ''
+            side: '',
+            positive: studentError.getPositive()
           });
           spansErrorEnd.push({
             index: currentIndex + originalTextFragment.length,
             type: studentError.getType(),
             id: studentError.getId(),
             start: false,
-            side: ''
+            side: '',
+            positive: studentError.getPositive()
           });
         }
         // add processed Text to current Index

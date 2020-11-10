@@ -20,7 +20,7 @@ export class Annotation {
    */
   static getAnnotationsFromString(text: string): Annotation[] {
     const errors = [];
-    let regex = /<error id="\d*" type="\w*"\/>/;
+    let regex = /<error id="\d*" type="\w*" positive="\w*"\/>/;
     let tempIndex = text.search(regex);
     let offset = 0;
     // search for all start tags of errors
@@ -77,7 +77,14 @@ export class Annotation {
     const startIndexType = text.search('type="') + 6;
     const typeLength = text.substr(startIndexType).search('"');
     const type = text.substr(startIndexType, typeLength);
-    return new Annotation(id, type, startIndex, -1, '', text.length, -1);
+    const positiveIndex = text.search('positive="') + 10;
+    const positiveLength = text.substr(positiveIndex).search('"');
+    const positiveString = text.substr(positiveIndex, positiveLength);
+    let positive = true;
+    if (positiveString === 'false') {
+      positive = false;
+    }
+    return new Annotation(id, type, startIndex, -1, '', text.length, -1, positive);
   }
 
   /**
@@ -97,7 +104,8 @@ export class Annotation {
     private endIndex: number,
     private text: string,
     private offsetFront: number,
-    private offsetBack: number
+    private offsetBack: number,
+    private positive: boolean
   ) {
   }
   getId(): number {
@@ -129,5 +137,11 @@ export class Annotation {
   }
   setOffsetBack(offsetBack: number): void {
     this.offsetBack = offsetBack;
+  }
+  getPositive(): boolean {
+    return this.positive;
+  }
+  setPositive(positive: boolean): void {
+    this.positive = positive;
   }
 }

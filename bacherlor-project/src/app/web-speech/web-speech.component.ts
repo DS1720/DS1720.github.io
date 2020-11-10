@@ -9,8 +9,9 @@ import { ActionContext } from '../shared/services/actions/action-context';
 import { SpeechNotification } from '../shared/model/speech-notification';
 import {Annotation} from '../shared/Entities/annotation';
 import {StudentErrorType} from '../shared/Entities/annotation-type';
-import { faMicrophone } from '@fortawesome/free-solid-svg-icons';
-import { faMicrophoneSlash } from '@fortawesome/free-solid-svg-icons';
+import { faMicrophone, faMicrophoneSlash, faCheckCircle,  faTimesCircle} from '@fortawesome/free-solid-svg-icons';
+import {Router} from '@angular/router';
+import {DataService} from '../shared/services/data.service';
 
 @Component({
   selector: 'wsa-web-speech',
@@ -19,8 +20,12 @@ import { faMicrophoneSlash } from '@fortawesome/free-solid-svg-icons';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WebSpeechComponent implements OnInit {
+
   faMicrophone = faMicrophone;
   faMicrophoneSlash = faMicrophoneSlash;
+  faCheckCircle = faCheckCircle;
+  faTimesCircle = faTimesCircle;
+
   SEPARATORS = ['.', ' ', ',', '!', '?'];
   languages: string[] = languages;
   currentLanguage: string = defaultLanguage;
@@ -32,13 +37,19 @@ export class WebSpeechComponent implements OnInit {
   defaultError$ = new Subject<string | undefined>();
   annotationTypes: string[] = [];
   activeAnnotationType = '';
+  activeAnnotationPositive = false;
   activeStudent = {id: 1, name: 'John Doe', course: 'Technical English Communication A'};
   exam = {name: 'Mid Term 2020S', maxPoints: 100, reachedPoints: 0};
-  tempTranscript = 'init';
+  showEditPopup = false;
+  textToEdit = '';
+  feedback = '';
+  editTextIndexes: number[] = [-1, -1];
 
   constructor(
     private speechRecognizer: SpeechRecognizerService,
-    private actionContext: ActionContext
+    private actionContext: ActionContext,
+    private router: Router,
+    private dataService: DataService
   ) {
   }
 
@@ -87,9 +98,36 @@ export class WebSpeechComponent implements OnInit {
     this.activeAnnotationType = this.annotationTypes[0];
   }
 
-  // changes type of error
+  /**
+   * changes type of error
+   */
   changeErrorType(type: string): void {
     this.activeAnnotationType = type;
+  }
+
+  /**
+   * toogles Edit Popup Boolean
+   */
+  toogleEditPopup(): void {
+    this.showEditPopup = !this.showEditPopup;
+  }
+
+  /**
+   * saves data to dataService
+   */
+  saveFeedbackAndTranscript(): void{
+    this.dataService.saveFeedback(this.feedback);
+    this.dataService.saveTranscript(this.totalTranscript);
+  }
+
+  /**
+   * saves data to dataService
+   * routeToFeedback
+   */
+  saveAndRouteToFeedback(): void {
+    this.dataService.saveFeedback(this.feedback);
+    this.dataService.saveTranscript(this.totalTranscript);
+    this.router.navigate(['/feedback']);
   }
 
   /**
@@ -116,22 +154,40 @@ export class WebSpeechComponent implements OnInit {
       }
       // if error type is selected save error
       if (this.activeAnnotationType !== 'delete' && this.activeAnnotationType !== 'edit') {
-        this.saveAnnotation(globalIndexes[0], globalIndexes[1], this.activeAnnotationType.split(' ').join(''));
+        this.saveAnnotation(globalIndexes[0], globalIndexes[1],
+          this.activeAnnotationType.split(' ').join(''), this.activeAnnotationPositive);
       } else if (this.activeAnnotationType === 'delete') {
         globalIndexes = this.transformIndexesToOffset(globalIndexes);
         this.deleteNextAnnotationInTranscript(globalIndexes[0], globalIndexes[1]);
       } else if (this.activeAnnotationType === 'edit') {
-        // edit marked text
+        globalIndexes = this.transformIndexesToOffset(globalIndexes);
+        this.editMarkedText(globalIndexes[0], globalIndexes[1]);
       }
     }
   }
 
   /**
-   * returns Transcript without annotationTags
+   *
+   * @param startIndex
+   * @param endIndex
    * @private
    */
-  private getTranscriptWithoutTags(): string {
-    return this.totalTranscript.replace(/<[^>]+>/g, '');
+  private editMarkedText(startIndex: number, endIndex: number): void {
+    this.toogleEditPopup();
+    this.editTextIndexes = [startIndex, endIndex];
+    this.textToEdit = this.totalTranscript.substr(startIndex, endIndex - startIndex);
+  }
+
+  confirmEditText(): void {
+    this.changeTranscript(this.editTextIndexes[0], this.editTextIndexes[1], this.textToEdit);
+    this.toogleEditPopup();
+    this.textToEdit = '';
+    this.editTextIndexes = [-1, -1];
+  }
+
+  private changeTranscript(startIndex: number, endIndex: number, insert: string): void {
+    this.deleteFromTranscript(startIndex, endIndex);
+    this.insertIntoTranscript(startIndex, insert);
   }
 
   /**
@@ -199,10 +255,10 @@ export class WebSpeechComponent implements OnInit {
    * @param end index
    * @param annotationType
    */
-  private saveAnnotation(start: number, end: number, annotationType: string): void {
+  private saveAnnotation(start: number, end: number, annotationType: string, positive: boolean): void {
     const newId = Annotation.getNewId(Annotation.getAnnotationsFromString(this.totalTranscript));
     this.insertIntoTranscript(end, `<error id="${newId}"/>`);
-    this.insertIntoTranscript(start, `<error id="${newId}" type="${annotationType}"/>`);
+    this.insertIntoTranscript(start, `<error id="${newId}" type="${annotationType}" positive="${positive}"/>`);
   }
 
   /**
@@ -272,7 +328,7 @@ export class WebSpeechComponent implements OnInit {
   private deleteNextAnnotationInTranscript(startIndex: number, endIndex: number): void {
     const currentAnnotations = Annotation.getAnnotationsFromString(this.totalTranscript);
     const deleteAnnotations: Annotation[] = [];
-    const deleteAnnotationsFurther: Annotation[] = [];
+    let firstAnnotationOutside: Annotation = new Annotation(-1, '', -1, -1, '', -1, -1, false);
     console.log(startIndex, endIndex);
     console.log(currentAnnotations);
     // delete all annotations inside
@@ -281,13 +337,15 @@ export class WebSpeechComponent implements OnInit {
         deleteAnnotations.push(annotation);
       }
       if (annotation.getStartIndex() <= startIndex && annotation.getEndIndex() >= endIndex) {
-        deleteAnnotationsFurther.push(annotation);
+        if (firstAnnotationOutside.getId() === -1 || firstAnnotationOutside.getStartIndex() < annotation.getStartIndex()){
+          firstAnnotationOutside = annotation;
+        }
       }
     }
     if (deleteAnnotations.length !== 0) {
       this.deleteAnnotationsFromTranscript(deleteAnnotations);
     } else {
-      this.deleteAnnotationsFromTranscript(deleteAnnotationsFurther);
+      this.deleteAnnotationsFromTranscript([firstAnnotationOutside]);
     }
   }
 
@@ -312,6 +370,14 @@ export class WebSpeechComponent implements OnInit {
       return a.startIndex > b.startIndex ? -1 : a.startIndex < b.startIndex ? 1 : 0;
     });
     deleteIndexes.forEach(index => this.deleteFromTranscript(index.startIndex, index.endIndex));
+  }
+
+  /**
+   * sets activeAnnotationPositive to value
+   * @param value
+   */
+  setActiveAnnotationPositive(value: boolean): void {
+    this.activeAnnotationPositive = value;
   }
 
   /**
@@ -425,4 +491,11 @@ export class WebSpeechComponent implements OnInit {
     return this.isListening;
   }
 
+  /**
+   * returns Transcript without annotationTags
+   * @private
+   */
+  private getTranscriptWithoutTags(): string {
+    return this.totalTranscript.replace(/<[^>]+>/g, '');
+  }
 }
