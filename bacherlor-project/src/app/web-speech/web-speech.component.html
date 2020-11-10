@@ -61,7 +61,7 @@
         <button class="delete" [class.active]="'delete'==activeAnnotationType" (click)="changeErrorType('delete')">Delete Annotation</button>
         <button class="edit" [class.active]="'edit'==activeAnnotationType" (click)="changeErrorType('edit')">Edit Text</button>
       </div>
-      <div class="split-buttons">
+      <div class="split-buttons save-buttons">
         <button class="save" (click)="saveFeedbackAndTranscript()">Save</button>
         <button class="save" (click)="saveAndRouteToFeedback()">Save & Exit</button>
       </div>

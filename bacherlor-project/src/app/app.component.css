@@ -1,3 +1,97 @@
 .fill-space {
   flex: 1 1 auto;
 }
+
+/*
+  Colors
+ */
+
+:root :host /deep/ {
+  --pronunciation-color: #8c2c2c;
+  --grammar-color: #C8963E;
+  --wordchoice-color: #032340;
+  --tense-color: #7C9EB2;
+  --positive-color: #1f672e;
+  --delete-color: black;
+  --edit-color: black;
+  --save-color: black;
+  --record-start: #86BA90;
+  --record-hover: #628869;
+  --record-hover-active: #ae4946;
+  --record-end: #E5625E;
+  --hover-color-black: rgb(96,96,96);
+}
+
+/*
+  Error spans
+  */
+
+:host /deep/ span.pronunciation {
+  border-top: 2px solid var(--pronunciation-color);
+  border-bottom: 2px solid var(--pronunciation-color);
+  display: inline-block;
+}
+
+:host /deep/ span.pronunciation.right {
+  border-right: 2px solid var(--pronunciation-color);
+}
+
+:host /deep/ span.pronunciation.left {
+  border-left: 2px solid var(--pronunciation-color);
+}
+
+:host /deep/ span.grammar {
+  border-top: 2px solid var(--grammar-color);
+  border-bottom: 2px solid var(--grammar-color);
+  display: inline-block;
+}
+
+:host /deep/ span.grammar.right {
+  border-right: 2px solid var(--grammar-color);
+}
+
+:host /deep/ span.grammar.left {
+  border-left: 2px solid var(--grammar-color);
+}
+
+:host /deep/ span.wordchoice {
+  border-top: 2px solid var(--wordchoice-color);
+  border-bottom: 2px solid var(--wordchoice-color);
+  display: inline-block;
+}
+
+:host /deep/ span.wordchoice.right {
+  border-right: 2px solid var(--wordchoice-color);
+}
+
+:host /deep/ span.wordchoice.left {
+  border-left: 2px solid var(--wordchoice-color);
+}
+
+:host /deep/ span.tense {
+  border-top: 2px solid var(--tense-color);
+  border-bottom: 2px solid var(--tense-color);
+  display: inline-block;
+}
+
+:host /deep/ span.tense.right {
+  border-right: 2px solid var(--tense-color);
+}
+
+:host /deep/ span.tense.left {
+  border-left: 2px solid var(--tense-color);
+}
+
+:host /deep/ span.positive {
+  border-top: 2px solid var(--positive-color);
+  border-bottom: 2px solid var(--positive-color);
+  display: inline-block;
+}
+
+:host /deep/ span.positive.right {
+  border-right: 2px solid var(--positive-color);
+}
+
+:host /deep/ span.positive.left {
+  border-left: 2px solid var(--positive-color);
+}

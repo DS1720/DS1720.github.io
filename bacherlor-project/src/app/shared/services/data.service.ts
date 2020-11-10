@@ -1,23 +1,20 @@
 import { Injectable } from '@angular/core';
+import {FeedbackSheet} from '../Entities/feedback-sheet';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DataService {
 
-  transcript = '';
-  feedback = '';
+  feedbackSheet: FeedbackSheet = new FeedbackSheet(
+    {id: -1, name: '', course: ''},
+    {name: '', maxPoints: -1, reachedPoints: -1}, '', '');
+
   constructor() { }
-  saveFeedback(feedback: string): void {
-    this.feedback = feedback;
+  saveFeedback(feedback: FeedbackSheet): void {
+    this.feedbackSheet = feedback;
   }
-  saveTranscript(transcript: string): void {
-    this.transcript = transcript;
-  }
-  getFeedback(): string {
-    return this.feedback;
-  }
-  getTranscript(): string {
-    return this.transcript;
+  getFeedback(): FeedbackSheet {
+    return this.feedbackSheet;
   }
 }

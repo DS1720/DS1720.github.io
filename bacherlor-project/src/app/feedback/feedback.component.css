@@ -1,0 +1,73 @@
+/**
+  Overall Container
+ */
+div.container {
+  max-width: 1000px;
+  margin: auto;
+  padding: 1rem;
+  background-color: white;
+}
+
+section {
+  margin-bottom: 1rem;
+}
+
+/**
+  Student Properties
+ */
+
+.name {
+  font-size: 1.5em;
+}
+
+/**
+  Transcript
+ */
+
+.transcript-container {
+  position: relative;
+}
+
+.transcript {
+  white-space: pre-wrap;
+  max-height: 200px;
+  overflow: hidden;
+  transition: max-height 0.5s ease-in-out;
+}
+
+.transcript.show-transcript {
+  max-height: none;
+}
+
+.white {
+  position: absolute;
+  background-image: linear-gradient(transparent, white);
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 40%;
+}
+
+.white.white-hidden {
+  display: none;
+}
+
+.transcript-button-container {
+  width: 100%;
+  text-align: center;
+}
+
+button.transcript-button {
+  font-size: 1.3em;
+  margin: .5rem;
+  background: none;
+  border: none;
+}
+
+button.transcript-button:hover {
+  color: var(--hover-color-black);
+}
+
+button.transcript-button:focus {
+  outline: none;
+}

@@ -12,6 +12,7 @@ import {StudentErrorType} from '../shared/Entities/annotation-type';
 import { faMicrophone, faMicrophoneSlash, faCheckCircle,  faTimesCircle} from '@fortawesome/free-solid-svg-icons';
 import {Router} from '@angular/router';
 import {DataService} from '../shared/services/data.service';
+import {FeedbackSheet} from '../shared/Entities/feedback-sheet';
 
 @Component({
   selector: 'wsa-web-speech',
@@ -42,6 +43,9 @@ export class WebSpeechComponent implements OnInit {
   exam = {name: 'Mid Term 2020S', maxPoints: 100, reachedPoints: 0};
   showEditPopup = false;
   textToEdit = '';
+  feedbackSheet: FeedbackSheet = new FeedbackSheet(
+    {id: -1, name: '', course: ''},
+    {name: '', maxPoints: -1, reachedPoints: -1}, '', '');
   feedback = '';
   editTextIndexes: number[] = [-1, -1];
 
@@ -96,6 +100,7 @@ export class WebSpeechComponent implements OnInit {
       this.annotationTypes.push(error);
     }
     this.activeAnnotationType = this.annotationTypes[0];
+    this.feedbackSheet = new FeedbackSheet(this.activeStudent, this.exam, this.totalTranscript, '');
   }
 
   /**
@@ -116,8 +121,9 @@ export class WebSpeechComponent implements OnInit {
    * saves data to dataService
    */
   saveFeedbackAndTranscript(): void{
-    this.dataService.saveFeedback(this.feedback);
-    this.dataService.saveTranscript(this.totalTranscript);
+    this.feedbackSheet.setFeedbackNotes(this.feedback);
+    this.feedbackSheet.setTranscript(this.totalTranscript);
+    this.dataService.saveFeedback(this.feedbackSheet);
   }
 
   /**
@@ -125,8 +131,7 @@ export class WebSpeechComponent implements OnInit {
    * routeToFeedback
    */
   saveAndRouteToFeedback(): void {
-    this.dataService.saveFeedback(this.feedback);
-    this.dataService.saveTranscript(this.totalTranscript);
+    this.saveFeedbackAndTranscript();
     this.router.navigate(['/feedback']);
   }
 
