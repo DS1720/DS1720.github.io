@@ -1,8 +1,10 @@
 /**
   Overall Container
  */
-div.container {
+div.feedback-container {
   max-width: 1000px;
+  border-left: whitesmoke solid 10px;
+  border-right: whitesmoke solid 10px;
   margin: auto;
   padding: 1rem;
   background-color: white;
