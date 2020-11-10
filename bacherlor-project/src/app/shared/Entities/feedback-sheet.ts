@@ -1,9 +1,12 @@
+import {Annotation} from './annotation';
+
 export class FeedbackSheet {
   constructor(
     private student: {id: number, name: string, course: string},
     private exam: {name: string, maxPoints: number, reachedPoints: number},
     private transcript: string,
-    private feedbackNotes: string
+    private feedbackNotes: string,
+    private annotations: {annotation: Annotation, annotationText: string, comment: string, links: string[]}[]
   ) {
   }
 
@@ -37,5 +40,12 @@ export class FeedbackSheet {
 
   setFeedbackNotes(value: string): void {
     this.feedbackNotes = value;
+  }
+  getAnnotations(): { annotation: Annotation, annotationText: string, comment: string, links: string[] }[] {
+    return this.annotations;
+  }
+
+  setAnnotations(value: { annotation: Annotation, annotationText: string, comment: string, links: string[] }[]): void {
+    this.annotations = value;
   }
 }

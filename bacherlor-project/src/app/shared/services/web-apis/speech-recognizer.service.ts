@@ -136,5 +136,6 @@ export class SpeechRecognizerService {
 
   stop(): void {
     this.recognition.stop();
+    this.isListening = false;
   }
 }

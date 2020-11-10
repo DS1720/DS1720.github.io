@@ -8,7 +8,7 @@ export class DataService {
 
   feedbackSheet: FeedbackSheet = new FeedbackSheet(
     {id: -1, name: '', course: ''},
-    {name: '', maxPoints: -1, reachedPoints: -1}, '', '');
+    {name: '', maxPoints: -1, reachedPoints: -1}, '', '', []);
 
   constructor() { }
   saveFeedback(feedback: FeedbackSheet): void {

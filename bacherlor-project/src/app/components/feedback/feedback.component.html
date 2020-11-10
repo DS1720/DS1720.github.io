@@ -1,0 +1,59 @@
+<div class="feedback-container">
+  <h1>Feedback</h1>
+  <section id="student">
+    <label for="student"><h2>Student:</h2></label>
+    <span class="name">{{feedbackSheet.getStudent().name}}</span> <br>
+    {{feedbackSheet.getExam().name}} | {{feedbackSheet.getStudent().course}}
+  </section>
+
+  <section id="transcript">
+    <label for="transcript"><h2>Recorded Transcript:</h2></label>
+    <div class="transcript-container">
+      <div class="transcript" [class.show-transcript]="showTranscript"
+           [innerHTML]="feedbackSheet.getTranscript() | transcriptFormat">
+      </div>
+      <div class="white" [class.white-hidden]="showTranscript"></div>
+    </div>
+    <div class="transcript-button-container">
+      <button class="transcript-button" *ngIf="!showTranscript">
+        <fa-icon (click)="toggleShowTranscript()" [icon]="faPlus"></fa-icon>
+      </button>
+      <button class="transcript-button" *ngIf="showTranscript">
+        <fa-icon (click)="toggleShowTranscript()" [icon]="faMinus"></fa-icon>
+      </button>
+    </div>
+  </section>
+
+  <section id="annotations">
+    <label for="annotations"><h2>Annotations:</h2></label>
+    <span *ngIf="countAnnotationItems('pronunciation') == 0">
+    <h3>Pronunciation:</h3>
+    <span class="annotation-item" *ngFor="let annotationItem of feedbackSheet.getAnnotations()">
+      <wsa-annotation-item *ngIf="annotationItem.annotation.getType() == 'pronunciation'"
+                           [annotationItem]="annotationItem"></wsa-annotation-item>
+    </span>
+    </span>
+    <span *ngIf="countAnnotationItems('pronunciation') == 0">
+    <h3>Grammar:</h3>
+    <span class="annotation-item" *ngFor="let annotationItem of feedbackSheet.getAnnotations()">
+      <wsa-annotation-item *ngIf="annotationItem.annotation.getType() == 'grammar'"
+                           [annotationItem]="annotationItem"></wsa-annotation-item>
+    </span>
+    </span>
+    <span *ngIf="countAnnotationItems('pronunciation') == 0">
+    <h3>Word Choice:</h3>
+    <span class="annotation-item" *ngFor="let annotationItem of feedbackSheet.getAnnotations()">
+      <wsa-annotation-item *ngIf="annotationItem.annotation.getType() == 'wordchoice'"
+                           [annotationItem]="annotationItem"></wsa-annotation-item>
+    </span>
+    </span>
+    <span *ngIf="countAnnotationItems('pronunciation') == 0">
+    <h3>Tense:</h3>
+    <span class="annotation-item" *ngFor="let annotationItem of feedbackSheet.getAnnotations()">
+      <wsa-annotation-item *ngIf="annotationItem.annotation.getType() == 'tense'"
+                           [annotationItem]="annotationItem"></wsa-annotation-item>
+    </span>
+    </span>
+  </section>
+</div>
+<button (click)="routeToExam()"> Save & Exit</button>

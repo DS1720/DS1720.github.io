@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { WebSpeechComponent } from './web-speech/web-speech.component';
-import {FeedbackComponent} from './feedback/feedback.component';
+import { WebSpeechComponent } from './components/web-speech/web-speech.component';
+import {FeedbackComponent} from './components/feedback/feedback.component';
 
 
 const routes: Routes = [

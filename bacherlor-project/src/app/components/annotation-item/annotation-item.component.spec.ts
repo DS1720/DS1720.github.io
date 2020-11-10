@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ModalHelpComponent } from './modal-help.component';
+import { AnnotationItemComponent } from './annotation-item.component';
 
-describe('ModalHelpComponent', () => {
-  let component: ModalHelpComponent;
-  let fixture: ComponentFixture<ModalHelpComponent>;
+describe('AnnotationItemComponent', () => {
+  let component: AnnotationItemComponent;
+  let fixture: ComponentFixture<AnnotationItemComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ModalHelpComponent ]
+      declarations: [ AnnotationItemComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ModalHelpComponent);
+    fixture = TestBed.createComponent(AnnotationItemComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

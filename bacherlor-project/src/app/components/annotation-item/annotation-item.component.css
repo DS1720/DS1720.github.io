@@ -1,0 +1,33 @@
+.spaces {
+  white-space: pre-wrap;
+}
+
+.annotation-container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.annotation-container.negative {
+  border-left: var(--negative-color) 15px solid;
+}
+
+.annotation-container.positive {
+  border-left: var(--positive-color) 15px solid;
+}
+
+.annotation-text {
+  width: 100%;
+  text-align: left;
+}
+
+.comment {
+  width: 100%;
+  text-align: left;
+}
+
+.links {
+}
+
+.links button {
+}

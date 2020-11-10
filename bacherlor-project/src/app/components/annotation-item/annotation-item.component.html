@@ -1,0 +1,13 @@
+<div class="annotation-container"
+     [class.negative]="!annotationItem.annotation.getPositive()"
+     [class.positive]="annotationItem.annotation.getPositive()">
+  <div class="annotation-text">
+    ... <span class="spaces" [innerHTML]="annotationItem.annotationText | transcriptFormat"></span> ...
+  </div>
+  <div class="comment" *ngIf="annotationItem.comment !== ''">
+    {{annotationItem.comment}}
+  </div>
+  <span *ngIf="annotationItem.links.length >= 0" class="links">
+      <button *ngFor="let link of annotationItem.links">{{link}}</button>
+  </span>
+</div>

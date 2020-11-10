@@ -1,18 +1,18 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { merge, Observable, of, Subject } from 'rxjs';
 import {count, map, tap} from 'rxjs/operators';
-import { defaultLanguage, languages } from '../shared/model/languages';
-import { SpeechError } from '../shared/model/speech-error';
-import { SpeechEvent } from '../shared/model/speech-event';
-import { SpeechRecognizerService } from '../shared/services/web-apis/speech-recognizer.service';
-import { ActionContext } from '../shared/services/actions/action-context';
-import { SpeechNotification } from '../shared/model/speech-notification';
-import {Annotation} from '../shared/Entities/annotation';
-import {StudentErrorType} from '../shared/Entities/annotation-type';
+import { defaultLanguage, languages } from '../../shared/model/languages';
+import { SpeechError } from '../../shared/model/speech-error';
+import { SpeechEvent } from '../../shared/model/speech-event';
+import { SpeechRecognizerService } from '../../shared/services/web-apis/speech-recognizer.service';
+import { ActionContext } from '../../shared/services/actions/action-context';
+import { SpeechNotification } from '../../shared/model/speech-notification';
+import {Annotation} from '../../shared/Entities/annotation';
+import {StudentErrorType} from '../../shared/Entities/annotation-type';
 import { faMicrophone, faMicrophoneSlash, faCheckCircle,  faTimesCircle} from '@fortawesome/free-solid-svg-icons';
 import {Router} from '@angular/router';
-import {DataService} from '../shared/services/data.service';
-import {FeedbackSheet} from '../shared/Entities/feedback-sheet';
+import {DataService} from '../../shared/services/data.service';
+import {FeedbackSheet} from '../../shared/Entities/feedback-sheet';
 
 @Component({
   selector: 'wsa-web-speech',
@@ -45,9 +45,10 @@ export class WebSpeechComponent implements OnInit {
   textToEdit = '';
   feedbackSheet: FeedbackSheet = new FeedbackSheet(
     {id: -1, name: '', course: ''},
-    {name: '', maxPoints: -1, reachedPoints: -1}, '', '');
+    {name: '', maxPoints: -1, reachedPoints: -1}, '', '', []);
   feedback = '';
   editTextIndexes: number[] = [-1, -1];
+  inserted = '';
 
   constructor(
     private speechRecognizer: SpeechRecognizerService,
@@ -100,7 +101,7 @@ export class WebSpeechComponent implements OnInit {
       this.annotationTypes.push(error);
     }
     this.activeAnnotationType = this.annotationTypes[0];
-    this.feedbackSheet = new FeedbackSheet(this.activeStudent, this.exam, this.totalTranscript, '');
+    this.feedbackSheet = new FeedbackSheet(this.activeStudent, this.exam, this.totalTranscript, '', []);
   }
 
   /**
@@ -396,9 +397,27 @@ export class WebSpeechComponent implements OnInit {
   }
 
   /**
+   * returns false if inserted text equals temporary text
+   */
+  showTemporaryText(): boolean {
+    const element = document.getElementById('temporaryText');
+    if (element) {
+      let recordedText = element.innerHTML;
+      // after first time inserted space has to be removed
+      if (recordedText[0] === ' ') {
+        recordedText = recordedText.substr(1, recordedText.length - 1);
+      }
+      if (recordedText === this.inserted) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
    * toggles between listening and not listening
    */
-  toogleListening(): void {
+  toggleListening(): void {
     if (this.isListening) {
       this.stop();
     } else {
@@ -415,7 +434,6 @@ export class WebSpeechComponent implements OnInit {
       this.stop();
       return;
     }
-
     this.defaultError$.next(undefined);
     this.speechRecognizer.start();
     this.isListening = true;
@@ -459,8 +477,7 @@ export class WebSpeechComponent implements OnInit {
         let message;
         switch (data.error) {
           case SpeechError.NotAllowed:
-            message = `Cannot run the demo.
-            Your browser is not authorized to access your microphone.
+            message = `Your browser is not authorized to access your microphone.
             Verify that your browser has access to your microphone and try again.`;
             break;
           case SpeechError.NoSpeech:
@@ -488,19 +505,12 @@ export class WebSpeechComponent implements OnInit {
       const message = notification.content?.trim() || '';
       this.actionContext.processMessage(message, this.currentLanguage);
       // this.actionContext.runAction(message, this.currentLanguage);
+      this.inserted = message;
       this.totalTranscript = `${this.totalTranscript} ${message}.`;
     }
   }
 
   listening(): boolean {
     return this.isListening;
-  }
-
-  /**
-   * returns Transcript without annotationTags
-   * @private
-   */
-  private getTranscriptWithoutTags(): string {
-    return this.totalTranscript.replace(/<[^>]+>/g, '');
   }
 }

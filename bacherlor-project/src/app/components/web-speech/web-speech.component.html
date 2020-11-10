@@ -1,6 +1,6 @@
-<!--section>
-  <mat-card *ngIf="errorMessage$| async as errorMessage" class="notification">{{errorMessage}}</mat-card>
-</section-->
+<section>
+  <div *ngIf="errorMessage$| async as errorMessage" class="notification">{{errorMessage}}</div>
+</section>
 
 <section *ngIf="showEditPopup" class="edit-transcript-container popup">
   <div id="edit-transcript">
@@ -21,7 +21,7 @@
         {{exam.name}} | {{activeStudent.course}}
       </div>
       <div class="record-button">
-        <button (click)="toogleListening()" class="recording" [class.active]="listening()">
+        <button (click)="toggleListening()" [class.active]="listening()">
           <fa-icon *ngIf="listening()" [icon]="faMicrophone"></fa-icon>
           <fa-icon *ngIf="!listening()" [icon]="faMicrophoneSlash"></fa-icon>
         </button>
@@ -36,7 +36,7 @@
       <div id="full-transcript">
         <span class="showSpaces transcipt" (click)="wordClicked($event)"
               [innerHTML]="totalTranscript | transcriptFormat"></span>
-        <span class="temporaryText">{{transcript$ | async}}</span>
+        <span [class.hide]="!showTemporaryText()" id="temporaryText">{{transcript$ | async}}</span>
       </div>
     </section>
     <section class="notes">
@@ -66,38 +66,4 @@
         <button class="save" (click)="saveAndRouteToFeedback()">Save & Exit</button>
       </div>
   </section>
-  <!--
-  <section>
-    <button mat-fab *ngIf="listening$ | async; else mic" (click)="stop()">
-      <mat-icon class="soundwave">mic</mat-icon>
-    </button>
-    <ng-template #mic>
-      <button mat-fab (click)="start()">
-        <mat-icon>mic</mat-icon>
-      </button>
-    </ng-template>
-  </section>
-  <section class="notes-container">
-      <div class="notes-flex-item">
-        <label for="notesStudent">Notes For Student</label>
-        <textarea name="notesStudent" id="notesStudent"></textarea>
-      </div>
-      <div class="notes-flex-item">
-        <label for="notesExaminer">Notes For Eaxminer (cannot be seen by student)</label>
-        <textarea name="notesExaminer" id="notesExaminer"></textarea>
-      </div>
-    </section>
-    <section class="points-container">
-      <div>
-      <h3>Points reached:</h3>
-      <div class="flex-container-points">
-        <input type="number" [(ngModel)]="exam.reachedPoints"><span>/{{exam.maxPoints}} Pts.</span>
-      </div>
-      </div>
-      <div class="button-row">
-        <button>Save</button>
-        <button>Save & Exit</button>
-      </div>
-    </section>
-  -->
 </div>

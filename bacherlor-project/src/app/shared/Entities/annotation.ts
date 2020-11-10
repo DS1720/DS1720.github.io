@@ -1,4 +1,8 @@
 export class Annotation {
+
+  static regexStartTag = /<error id="\d*" type="\w*" positive="\w*"\/>/;
+  static regexEndTag = /<error id="\d*"\/>/;
+
   /**
    * returns new annotationId
    * @param annotationArray of already existing annotations
@@ -20,7 +24,7 @@ export class Annotation {
    */
   static getAnnotationsFromString(text: string): Annotation[] {
     const errors = [];
-    let regex = /<error id="\d*" type="\w*" positive="\w*"\/>/;
+    let regex = this.regexStartTag;
     let tempIndex = text.search(regex);
     let offset = 0;
     // search for all start tags of errors
@@ -33,7 +37,7 @@ export class Annotation {
       // push found error
       errors.push(this.getAnnotationFromString(text.substr(beginIndex, endIndex - beginIndex + 1), beginIndex));
     }
-    regex = /<error id="\d*"\/>/;
+    regex = this.regexEndTag;
     offset = 0;
     tempIndex = text.search(regex);
     // find all ending tags of errors
@@ -85,6 +89,52 @@ export class Annotation {
       positive = false;
     }
     return new Annotation(id, type, startIndex, -1, '', text.length, -1, positive);
+  }
+
+  /**
+   * deletes all annotations from text with other id than id
+   * @param id of annotation that should not be deleted
+   * @param text to edit
+   */
+  static deleteTagsFromOtherAnnotations(id: number, text: string): string {
+    const startTagRegex = '<error id="((?!' + id + ').)*" type="\\w*" positive="\\w*"\\/>';
+    let startIndex = text.search(startTagRegex);
+    // as long as there are foreign tags
+    while (startIndex !== -1) {
+      // search for end index
+      let tempEnd = startIndex;
+      while (text[tempEnd] !== '>') {
+        tempEnd++;
+      }
+      tempEnd++;
+      // delete tag
+      text = this.deleteFromText(startIndex, tempEnd, text);
+      startIndex = text.search(startTagRegex);
+    }
+    const endTagRegex = '<error id="((?!' + id + ').)*"\\/>';
+    startIndex = text.search(endTagRegex);
+    while (startIndex !== -1) {
+      // search for end index
+      let tempEnd = startIndex;
+      while (text[tempEnd] !== '>') {
+        tempEnd++;
+      }
+      tempEnd++;
+      // delete tag
+      text = this.deleteFromText(startIndex, tempEnd, text);
+      startIndex = text.search(startTagRegex);
+    }
+    return text;
+  }
+
+  /**
+   * deletes from text
+   * @param startIndex of first letter deleted
+   * @param endIndex of last letter deleted
+   */
+  private static deleteFromText(startIndex: number, endIndex: number, text: string): string {
+    return text.substr(0, startIndex) +
+      text.substr(endIndex);
   }
 
   /**
