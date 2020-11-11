@@ -28,7 +28,7 @@
   display: grid;
   min-height: 0;
   grid-template-rows: 7em minmax(0, 1fr) 12em;
-  padding: 0rem 1rem 1rem 1rem;
+  padding: 0rem 0rem 1rem 1rem;
 }
 
 .properties-container section {
@@ -155,8 +155,10 @@ textarea.notes-text-container {
 .student-annotations-container {
   display: flex;
   flex-direction: column;
-  margin-top: 1rem;
-  margin-right: 1rem;
+  padding-left: 1rem;
+  padding-top: 1rem;
+  padding-right: 1rem;
+  background: white;
 }
 
 /*
@@ -173,7 +175,7 @@ textarea.notes-text-container {
 
 .student-annotations-container button, .student-annotations-container .split-buttons button {
   padding-left: 20px;
-  border: solid 1px #333;
+  border: none;
   border-radius: 5px;
   outline: none;
   height: 100%;
@@ -205,7 +207,7 @@ textarea.notes-text-container {
   padding-left: 20px;
   border-top-left-radius: 0px;
   border-bottom-left-radius: 0px;
-  background-image: linear-gradient(to right, white 50%, var(--positive-color) 50%);
+  background-image: linear-gradient(to right, var(--button-background-color) 50%, var(--positive-color) 50%);
 }
 
 .student-annotations-container button {
@@ -233,27 +235,27 @@ textarea.notes-text-container {
 }
 
 button.pronunciation {
-  background-image: linear-gradient(to right, white 50%, var(--pronunciation-color) 50%);
+  background-image: linear-gradient(to right, var(--button-background-color) 50%, var(--pronunciation-color) 50%);
 }
 
 button.grammar {
-  background-image: linear-gradient(to right, white 50%, var(--grammar-color) 50%);
+  background-image: linear-gradient(to right, var(--button-background-color) 50%, var(--grammar-color) 50%);
 }
 
 button.wordchoice {
-  background-image: linear-gradient(to right, white 50%, var(--wordchoice-color) 50%);
+  background-image: linear-gradient(to right, var(--button-background-color) 50%, var(--wordchoice-color) 50%);
 }
 
 button.tense {
-  background-image: linear-gradient(to right, white 50%, var(--tense-color) 50%);
+  background-image: linear-gradient(to right, var(--button-background-color) 50%, var(--tense-color) 50%);
 }
 
 button.delete {
-  background-image: linear-gradient(to right, white 50%, var(--delete-color) 50%);
+  background-image: linear-gradient(to right, var(--button-background-color) 50%, var(--delete-color) 50%);
 }
 
 button.edit {
-  background-image: linear-gradient(to right, white 50%, var(--edit-color) 50%);
+  background-image: linear-gradient(to right, var(--button-background-color) 50%, var(--edit-color) 50%);
 }
 
 .split-buttons {
@@ -261,7 +263,18 @@ button.edit {
 }
 
 button.save {
-  background-image: linear-gradient(to right, white 50%, var(--save-color) 50%);
+  background: var(--button-background-color);
+  padding-left: 0 !important;
+}
+
+button.save:hover {
+  background: var(--button-background-hover-color);
+  transition: none;
+  color: black !important;
+}
+
+button.save:active {
+  border: black 2px solid !important;
 }
 
 /*

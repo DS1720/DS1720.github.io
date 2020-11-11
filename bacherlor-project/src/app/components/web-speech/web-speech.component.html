@@ -20,7 +20,7 @@
         <h1>{{activeStudent.name}}</h1>
         {{exam.name}} | {{activeStudent.course}}
       </div>
-      <div class="record-button">
+      <div class="record-button" *ngIf="!edit">
         <button (click)="toggleListening()" [class.active]="listening()">
           <fa-icon *ngIf="listening()" [icon]="faMicrophone"></fa-icon>
           <fa-icon *ngIf="!listening()" [icon]="faMicrophoneSlash"></fa-icon>
@@ -63,7 +63,10 @@
       </div>
       <div class="split-buttons save-buttons">
         <button class="save" (click)="saveFeedbackAndTranscript()">Save</button>
-        <button class="save" (click)="saveAndRouteToFeedback()">Save & Exit</button>
+        <button class="save" (click)="saveAndRouteToFeedback()">
+          <span *ngIf="!edit">Save & Exit</span>
+          <span *ngIf="edit">go to Feedback</span>
+        </button>
       </div>
   </section>
 </div>

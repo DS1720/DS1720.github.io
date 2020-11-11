@@ -9,6 +9,7 @@ import { WebSpeechModule } from './components/web-speech/web-speech.module';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import { FeedbackComponent } from './components/feedback/feedback.component';
 import { AnnotationItemComponent } from './components/annotation-item/annotation-item.component';
+import {FormsModule} from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { AnnotationItemComponent } from './components/annotation-item/annotation
     BrowserAnimationsModule,
     SharedModule,
     WebSpeechModule,
-    FontAwesomeModule
+    FontAwesomeModule,
+    FormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

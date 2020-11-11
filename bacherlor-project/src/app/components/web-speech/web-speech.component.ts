@@ -10,7 +10,7 @@ import { SpeechNotification } from '../../shared/model/speech-notification';
 import {Annotation} from '../../shared/Entities/annotation';
 import {StudentErrorType} from '../../shared/Entities/annotation-type';
 import { faMicrophone, faMicrophoneSlash, faCheckCircle,  faTimesCircle} from '@fortawesome/free-solid-svg-icons';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {DataService} from '../../shared/services/data.service';
 import {FeedbackSheet} from '../../shared/Entities/feedback-sheet';
 
@@ -27,6 +27,40 @@ export class WebSpeechComponent implements OnInit {
   faCheckCircle = faCheckCircle;
   faTimesCircle = faTimesCircle;
 
+  transcriptToShow = 'Flamingos usually stand on one leg, with the other being tucked beneath the body. ' +
+    'The reason for this behaviour is not fully understood. One theory is that standing on one leg allows the ' +
+    'birds to conserve more body heat, given that they spend a significant amount of time wading in cold water. ' +
+    'However, the behaviour also takes place in warm water and is also observed in birds that do not typically stand in water. ' +
+    'An alternative theory is that standing on one leg reduces the energy expenditure for producing muscular effort to ' +
+    'stand and balance on one leg. A study on cadavers showed that the one-legged pose could be held without any ' +
+    'muscle activity, while living flamingos demonstrate substantially less body sway in a one-legged posture. ' +
+    'As well as standing in the water, flamingos may stamp their webbed feet in the mud to stir up food from the bottom. ' +
+    'Flamingos are capable flyers, and flamingos in captivity often require wing clipping to prevent escape. ' +
+    'A pair of African flamingos which had not yet had their wings clipped escaped from the Wichita, Kansas zoo in 2005. ' +
+    'One was spotted in Texas 14 years later. Young flamingos hatch with grayish-red plumage, but adults range from ' +
+    'light pink to bright red due to aqueous bacteria and beta-carotene obtained from their food supply. A well-fed, ' +
+    'healthy flamingo is more vibrantly colored, thus a more desirable mate; a white or pale flamingo, however, is usually ' +
+    'unhealthy or malnourished. Captive flamingos are a notable exception; they may turn a pale pink if they are not fed ' +
+    'carotene at levels comparable to the wild. Flamingoes can open their bills by raising the upper jaw as well as by ' +
+    'dropping the lower.' +
+    'Flamingos usually stand on one leg, with the other being tucked beneath the body. ' +
+    'The reason for this behaviour is not fully understood. One theory is that standing on one leg allows the ' +
+    'birds to conserve more body heat, given that they spend a significant amount of time wading in cold water. ' +
+    'However, the behaviour also takes place in warm water and is also observed in birds that do not typically stand in water. ' +
+    'An alternative theory is that standing on one leg reduces the energy expenditure for producing muscular effort to ' +
+    'stand and balance on one leg. A study on cadavers showed that the one-legged pose could be held without any ' +
+    'muscle activity, while living flamingos demonstrate substantially less body sway in a one-legged posture. ' +
+    'As well as standing in the water, flamingos may stamp their webbed feet in the mud to stir up food from the bottom. ' +
+    'Flamingos are capable flyers, and flamingos in captivity often require wing clipping to prevent escape. ' +
+    'A pair of African flamingos which had not yet had their wings clipped escaped from the Wichita, Kansas zoo in 2005. ' +
+    'One was spotted in Texas 14 years later. Young flamingos hatch with grayish-red plumage, but adults range from ' +
+    'light pink to bright red due to aqueous bacteria and beta-carotene obtained from their food supply. A well-fed, ' +
+    'healthy flamingo is more vibrantly colored, thus a more desirable mate; a white or pale flamingo, however, is usually ' +
+    'unhealthy or malnourished. Captive flamingos are a notable exception; they may turn a pale pink if they are not fed ' +
+    'carotene at levels comparable to the wild. Flamingoes can open their bills by raising the upper jaw as well as by ' +
+    'dropping the lower.';
+
+  edit = false;
   SEPARATORS = ['.', ' ', ',', '!', '?'];
   languages: string[] = languages;
   currentLanguage: string = defaultLanguage;
@@ -54,43 +88,15 @@ export class WebSpeechComponent implements OnInit {
     private speechRecognizer: SpeechRecognizerService,
     private actionContext: ActionContext,
     private router: Router,
-    private dataService: DataService
+    private dataService: DataService,
+    private route: ActivatedRoute
   ) {
   }
 
   ngOnInit(): void {
-    this.totalTranscript = 'Flamingos usually stand on one leg, with the other being tucked beneath the body. ' +
-      'The reason for this behaviour is not fully understood. One theory is that standing on one leg allows the ' +
-      'birds to conserve more body heat, given that they spend a significant amount of time wading in cold water. ' +
-      'However, the behaviour also takes place in warm water and is also observed in birds that do not typically stand in water. ' +
-      'An alternative theory is that standing on one leg reduces the energy expenditure for producing muscular effort to ' +
-      'stand and balance on one leg. A study on cadavers showed that the one-legged pose could be held without any ' +
-      'muscle activity, while living flamingos demonstrate substantially less body sway in a one-legged posture. ' +
-      'As well as standing in the water, flamingos may stamp their webbed feet in the mud to stir up food from the bottom. ' +
-      'Flamingos are capable flyers, and flamingos in captivity often require wing clipping to prevent escape. ' +
-      'A pair of African flamingos which had not yet had their wings clipped escaped from the Wichita, Kansas zoo in 2005. ' +
-      'One was spotted in Texas 14 years later. Young flamingos hatch with grayish-red plumage, but adults range from ' +
-      'light pink to bright red due to aqueous bacteria and beta-carotene obtained from their food supply. A well-fed, ' +
-      'healthy flamingo is more vibrantly colored, thus a more desirable mate; a white or pale flamingo, however, is usually ' +
-      'unhealthy or malnourished. Captive flamingos are a notable exception; they may turn a pale pink if they are not fed ' +
-      'carotene at levels comparable to the wild. Flamingoes can open their bills by raising the upper jaw as well as by ' +
-      'dropping the lower.' +
-      'Flamingos usually stand on one leg, with the other being tucked beneath the body. ' +
-      'The reason for this behaviour is not fully understood. One theory is that standing on one leg allows the ' +
-      'birds to conserve more body heat, given that they spend a significant amount of time wading in cold water. ' +
-      'However, the behaviour also takes place in warm water and is also observed in birds that do not typically stand in water. ' +
-      'An alternative theory is that standing on one leg reduces the energy expenditure for producing muscular effort to ' +
-      'stand and balance on one leg. A study on cadavers showed that the one-legged pose could be held without any ' +
-      'muscle activity, while living flamingos demonstrate substantially less body sway in a one-legged posture. ' +
-      'As well as standing in the water, flamingos may stamp their webbed feet in the mud to stir up food from the bottom. ' +
-      'Flamingos are capable flyers, and flamingos in captivity often require wing clipping to prevent escape. ' +
-      'A pair of African flamingos which had not yet had their wings clipped escaped from the Wichita, Kansas zoo in 2005. ' +
-      'One was spotted in Texas 14 years later. Young flamingos hatch with grayish-red plumage, but adults range from ' +
-      'light pink to bright red due to aqueous bacteria and beta-carotene obtained from their food supply. A well-fed, ' +
-      'healthy flamingo is more vibrantly colored, thus a more desirable mate; a white or pale flamingo, however, is usually ' +
-      'unhealthy or malnourished. Captive flamingos are a notable exception; they may turn a pale pink if they are not fed ' +
-      'carotene at levels comparable to the wild. Flamingoes can open their bills by raising the upper jaw as well as by ' +
-      'dropping the lower.';
+    this.edit = this.route.snapshot.queryParamMap.get('edit') ? this.route.snapshot.queryParamMap.get('edit') === 'true' : false;
+    // this.totalTranscript = '';
+    this.totalTranscript = this.transcriptToShow;
     const webSpeechReady = this.speechRecognizer.initialize(this.currentLanguage);
     if (webSpeechReady) {
       this.initRecognition();
@@ -101,7 +107,15 @@ export class WebSpeechComponent implements OnInit {
       this.annotationTypes.push(error);
     }
     this.activeAnnotationType = this.annotationTypes[0];
-    this.feedbackSheet = new FeedbackSheet(this.activeStudent, this.exam, this.totalTranscript, '', []);
+    if (this.edit) {
+      this.feedbackSheet = this.dataService.getFeedback();
+      this.activeStudent = this.feedbackSheet.getStudent();
+      this.exam = this.feedbackSheet.getExam();
+      this.totalTranscript = this.feedbackSheet.getTranscript();
+      this.feedback = this.feedbackSheet.getFeedbackNotes();
+    } else {
+      this.feedbackSheet = new FeedbackSheet(this.activeStudent, this.exam, this.totalTranscript, '', []);
+    }
   }
 
   /**

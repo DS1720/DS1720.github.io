@@ -1,13 +1,51 @@
 <div class="annotation-container"
      [class.negative]="!annotationItem.annotation.getPositive()"
      [class.positive]="annotationItem.annotation.getPositive()">
-  <div class="annotation-text">
-    ... <span class="spaces" [innerHTML]="annotationItem.annotationText | transcriptFormat"></span> ...
+  <div class="annotation-text-container"
+       [class.edit]="edit"
+       [class.commentActive]="annotationItem.comment !== '' || edit"
+       [class.linksActive]="annotationItem.links.length > 0 || edit">
+    <span class="annotation-text">
+    ... <span class="spaces " [innerHTML]="annotationItem.annotationText | transcriptFormat"></span> ...
+    </span>
   </div>
-  <div class="comment" *ngIf="annotationItem.comment !== ''">
-    {{annotationItem.comment}}
-  </div>
-  <span *ngIf="annotationItem.links.length >= 0" class="links">
-      <button *ngFor="let link of annotationItem.links">{{link}}</button>
+  <div class="right-container" [class.edit]="edit"
+       *ngIf="annotationItem.comment !== '' || annotationItem.links.length > 0 || edit">
+    <div class="comment-container"
+         *ngIf="annotationItem.comment !== '' || edit"
+         [class.linksActive]="annotationItem.links.length > 0 || edit">
+      <span *ngIf="!edit" class="comment"><i>{{annotationItem.comment}}</i></span>
+      <textarea placeholder="insert comment..." *ngIf="edit" id="comment-editor"
+                [(ngModel)]="annotationItem.comment"></textarea>
+    </div>
+    <span *ngIf="annotationItem.links.length > 0 || edit"
+          class="links"
+          [class.no-edit]="!edit"
+          [class.commentActive]="annotationItem.comment !== '' || edit"
+    >
+    <u>Useful learning lessons:</u>
+    <ul>
+      <li *ngFor="let link of annotationItem.links">
+        <fa-icon *ngIf="!edit" [icon]="faArrowCircleRight"></fa-icon>
+        <fa-icon *ngIf="edit" (click)="deleteLink(link)" class="trash hover-button" [icon]="faTrash"></fa-icon>
+        {{link}}</li>
+      <input *ngIf="edit" list="silos" id="silo-selector" name="silo-selector" [(ngModel)]="selectedLink">
+      <fa-icon *ngIf="edit" (click)="addLink()" class="hover-button" [icon]="faPlus"></fa-icon>
+      <datalist id="silos">
+        <option value="a vs. an"></option>
+        <option value="a vs. the vs. possesive"></option>
+        <option value="-able"></option>
+        <option value="all"></option>
+        <option value="b vs. silent b"></option>
+        <option value="can vs. be able"></option>
+        <option value="failure vs. mistake"></option>
+        <option value="get vs. become"></option>
+        <option value="passive speech"></option>
+        <option value="-th"></option>
+        <option value="v vs. w"></option>
+        <option value="Pronunciation Index"></option>
+      </datalist>
+    </ul>
   </span>
+  </div>
 </div>

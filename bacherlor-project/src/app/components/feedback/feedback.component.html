@@ -1,3 +1,20 @@
+<div class="edit-mode-button">
+  <div class="button-container">
+    <button (click)="toggleEdit()">
+      <span *ngIf="edit"><fa-icon [icon]="faUserGraduate"></fa-icon> go to student view</span>
+      <span *ngIf="!edit"><fa-icon [icon]="faEdit"></fa-icon> go to edit mode</span>
+    </button>
+    <button (click)="save()">
+      <fa-icon [icon]="faSave"></fa-icon>
+      Save
+    </button>
+    <button (click)="saveAndExit()">
+      <fa-icon [icon]="faSignOutAlt"></fa-icon>
+      Save & Exit
+    </button>
+  </div>
+</div>
+
 <div class="feedback-container">
   <h1>Feedback</h1>
   <section id="student">
@@ -6,10 +23,22 @@
     {{feedbackSheet.getExam().name}} | {{feedbackSheet.getStudent().course}}
   </section>
 
-  <section id="transcript">
-    <label for="transcript"><h2>Recorded Transcript:</h2></label>
+  <section id="transcript" class="spaces">
+    <label for="transcript">
+      <h2>
+        <fa-icon class="hover-button" (click)="editTranscript()" [icon]="faEdit" *ngIf="edit"></fa-icon>
+        Recorded Transcript:
+      </h2>
+      <div class="legend">Annotation-Types:
+      <div class="legend-item pronunciation">pronunciation mistake</div>
+      <div class="legend-item grammar">grammar mistake</div>
+      <div class="legend-item wordchoice">word choice mistake</div>
+      <div class="legend-item tense">tense mistake</div>
+      <div class="legend-item positive">positive annotation</div>
+      </div>
+    </label>
     <div class="transcript-container">
-      <div class="transcript" [class.show-transcript]="showTranscript"
+      <div class="transcript spaces" [class.show-transcript]="showTranscript"
            [innerHTML]="feedbackSheet.getTranscript() | transcriptFormat">
       </div>
       <div class="white" [class.white-hidden]="showTranscript"></div>
@@ -26,34 +55,63 @@
 
   <section id="annotations">
     <label for="annotations"><h2>Annotations:</h2></label>
-    <span *ngIf="countAnnotationItems('pronunciation') == 0">
-    <h3>Pronunciation:</h3>
-    <span class="annotation-item" *ngFor="let annotationItem of feedbackSheet.getAnnotations()">
-      <wsa-annotation-item *ngIf="annotationItem.annotation.getType() == 'pronunciation'"
-                           [annotationItem]="annotationItem"></wsa-annotation-item>
+    <span class="annotation-items-container" *ngIf="countAnnotationItems('pronunciation') > 0">
+      <h3 class="pronunciation">Pronunciation:</h3>
+      <span class="annotation-item" *ngFor="let annotationItem of feedbackSheet.getAnnotations()">
+        <wsa-annotation-item *ngIf="annotationItem.annotation.getType() == 'pronunciation'"
+                              [annotationItem]="annotationItem"
+                              [edit]="edit"></wsa-annotation-item>
+      </span>
     </span>
+    <span class="annotation-items-container" *ngIf="countAnnotationItems('grammar') > 0">
+      <h3 class="grammar">Grammar:</h3>
+      <span class="annotation-item" *ngFor="let annotationItem of feedbackSheet.getAnnotations()">
+        <wsa-annotation-item *ngIf="annotationItem.annotation.getType() == 'grammar'"
+                            [annotationItem]="annotationItem"
+                            [edit]="edit"></wsa-annotation-item>
+      </span>
     </span>
-    <span *ngIf="countAnnotationItems('pronunciation') == 0">
-    <h3>Grammar:</h3>
-    <span class="annotation-item" *ngFor="let annotationItem of feedbackSheet.getAnnotations()">
-      <wsa-annotation-item *ngIf="annotationItem.annotation.getType() == 'grammar'"
-                           [annotationItem]="annotationItem"></wsa-annotation-item>
+    <span class="annotation-items-container" *ngIf="countAnnotationItems('wordchoice') > 0">
+      <h3 class="wordchoice">Word Choice:</h3>
+      <span class="annotation-item" *ngFor="let annotationItem of feedbackSheet.getAnnotations()">
+        <wsa-annotation-item *ngIf="annotationItem.annotation.getType() == 'wordchoice'"
+                            [annotationItem]="annotationItem"
+                            [edit]="edit"></wsa-annotation-item>
+      </span>
     </span>
-    </span>
-    <span *ngIf="countAnnotationItems('pronunciation') == 0">
-    <h3>Word Choice:</h3>
-    <span class="annotation-item" *ngFor="let annotationItem of feedbackSheet.getAnnotations()">
-      <wsa-annotation-item *ngIf="annotationItem.annotation.getType() == 'wordchoice'"
-                           [annotationItem]="annotationItem"></wsa-annotation-item>
-    </span>
-    </span>
-    <span *ngIf="countAnnotationItems('pronunciation') == 0">
-    <h3>Tense:</h3>
-    <span class="annotation-item" *ngFor="let annotationItem of feedbackSheet.getAnnotations()">
-      <wsa-annotation-item *ngIf="annotationItem.annotation.getType() == 'tense'"
-                           [annotationItem]="annotationItem"></wsa-annotation-item>
-    </span>
+    <span *ngIf="countAnnotationItems('tense') > 0">
+    <h3 class="tense">Tense:</h3>
+      <span class="annotation-item" *ngFor="let annotationItem of feedbackSheet.getAnnotations()">
+        <wsa-annotation-item *ngIf="annotationItem.annotation.getType() == 'tense'"
+                            [annotationItem]="annotationItem"
+                            [edit]="edit"></wsa-annotation-item>
+      </span>
     </span>
   </section>
+  <section id="notes-container" *ngIf="feedbackSheet.getFeedbackNotes() != '' || edit">
+    <label for="annotations"><h2>Notes from Examiner:</h2></label>
+    <span *ngIf="!edit">{{feedbackSheet.getFeedbackNotes()}}</span>
+    <textarea placeholder="insert notes..." *ngIf="edit" [ngModel]="feedbackSheet.getFeedbackNotes()"
+              (ngModelChange)="feedbackSheet.setFeedbackNotes($event)"></textarea>
+  </section>
+  <section id="points">
+    <label for="points"><h2 class="inline">Total Points on Exam: </h2>
+      <h1 class="inline">
+        <span *ngIf="edit"><input type="number" min="0"
+                                  [max]="feedbackSheet.getExam().maxPoints"
+                                  [(ngModel)]="feedbackSheet.getExam().reachedPoints"></span>
+        <span *ngIf="!edit">{{feedbackSheet.getExam().reachedPoints}}</span>
+        /{{feedbackSheet.getExam().maxPoints}}</h1>
+    </label>
+  </section>
+  <div class="button-row">
+    <button *ngIf="!edit" (click)="routeToExam(false)">
+      <fa-icon [icon]="faHome"></fa-icon>
+      Return to Home
+    </button>
+    <button *ngIf="edit" (click)="saveAndExit()">
+      <fa-icon [icon]="faSignOutAlt"></fa-icon>
+      Save & Exit
+    </button>
+  </div>
 </div>
-<button (click)="routeToExam()"> Save & Exit</button>

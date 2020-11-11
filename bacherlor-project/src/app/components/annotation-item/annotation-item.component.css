@@ -16,18 +16,97 @@
   border-left: var(--positive-color) 15px solid;
 }
 
-.annotation-text {
-  width: 100%;
+.annotation-text-container {
   text-align: left;
+  padding: .5rem;
+  display: flex;
+  align-items: center;
+  min-width: 50%;
+  width: 100%;
+  background: whitesmoke;
+}
+
+.annotation-text-container.commentActive.linksActive {
+  width: 50%;
+}
+
+.annotation-text-container.commentActive, .annotation-text-container.linksActive {
+  width: 75%;
+}
+
+.annotation-text-container.edit {
+  min-width: 50%;
+  width: 50%;
+}
+
+.right-container {
+  width: 100%;
+  display: flex;
+}
+
+.right-container.edit {
+  width: 50%;
+}
+
+.comment-container {
+  margin-left: .5rem;
+  text-align: left;
+  background: whitesmoke;
+  radius: 5px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.comment-container.linksActive {
+  width: 50%;
 }
 
 .comment {
-  width: 100%;
   text-align: left;
+  padding: 1em;
+}
+
+#comment-editor {
+  margin: 1em;
+  width: 100%;
+  height: calc(100% - 2em);
+  padding: .5em;
+  resize: none;
 }
 
 .links {
+  display: flex;
+  flex-direction: column;
+  justify-content: right;
+  background: whitesmoke;
+  padding: 1em;
+  margin-left: .5rem;
+  width: 100%;
 }
 
-.links button {
+.links.commentActive {
+  width: 50%;
+}
+
+.links ul {
+  padding-left: 0rem;
+  list-style: none;
+}
+
+.links ul .hover-button:hover {
+  color: var(--hover-color-black);
+}
+
+.links li.no-edit:hover {
+  color: var(--hover-color-black);
+}
+
+.trash {
+  margin-right: .3em;
+}
+
+#silo-selector {
+  margin-right: .3em;
 }

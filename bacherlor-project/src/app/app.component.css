@@ -16,6 +16,8 @@
   --delete-color: black;
   --edit-color: black;
   --save-color: black;
+  --button-background-color: rgb(215, 215, 215);
+  --button-background-hover-color: rgb(141, 141, 141);
   --record-start: #86BA90;
   --record-hover: #628869;
   --record-hover-active: #ae4946;

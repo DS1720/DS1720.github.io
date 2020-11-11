@@ -1,10 +1,36 @@
 /**
+  Edit Mode Button
+ */
+
+.edit-mode-button {
+  z-index: 99;
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 1000px;
+  width: 100%;
+  text-align: right;
+}
+
+.edit-mode-button button {
+  border: 2px solid white;
+  border-radius: 5px;
+  background: var(--button-background-color);
+  padding: .5em;
+}
+
+.edit-mode-button button:hover {
+  background: var(--button-background-hover-color);
+}
+
+
+/**
   Overall Container
  */
 div.feedback-container {
   max-width: 1000px;
-  border-left: whitesmoke solid 10px;
-  border-right: whitesmoke solid 10px;
+  border: whitesmoke solid 10px;
   margin: auto;
   padding: 1rem;
   background-color: white;
@@ -26,12 +52,17 @@ section {
   Transcript
  */
 
+.spaces {
+  white-space: pre-wrap;
+}
+
 .transcript-container {
   position: relative;
+  background: whitesmoke;
 }
 
 .transcript {
-  white-space: pre-wrap;
+  padding: 0.5rem;
   max-height: 200px;
   overflow: hidden;
   transition: max-height 0.5s ease-in-out;
@@ -72,4 +103,103 @@ button.transcript-button:hover {
 
 button.transcript-button:focus {
   outline: none;
+}
+
+.inline {
+  display: inline;
+}
+
+/**
+  Annotations
+ */
+
+.legend {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.legend-item {
+  display: inline;
+  margin-left: 1rem;
+}
+
+.pronunciation, .grammar, .wordchoice, .tense, .positive {
+  padding-left: .5em;
+}
+
+h3.grammar, h3.wordchoice, h3.tense {
+  margin-top: 2rem;
+}
+
+.pronunciation {
+  border-left: var(--pronunciation-color) 15px solid;
+}
+
+.grammar {
+  border-left: var(--grammar-color) 15px solid;
+}
+
+.wordchoice {
+  border-left: var(--wordchoice-color) 15px solid;
+}
+
+.tense {
+  border-left: var(--tense-color) 15px solid;
+}
+
+.positive {
+  border-left: var(--positive-color) 15px solid;
+}
+
+/**
+  Notes
+ */
+#notes-container textarea {
+  width: calc(100% - 1em);
+  height: 5em;
+  resize: none;
+  padding: 0.5em;
+}
+
+/**
+  Points
+ */
+
+#points {
+  text-align: right;
+}
+
+#points input {
+  margin-left: 1rem;
+  width: auto;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  font-size: 1em;
+  width: 3em;
+  text-align: right;
+}
+
+/*
+  Button-Row
+ */
+
+.button-row {
+  display: flex;
+  justify-content: center;
+}
+
+.button-row button {
+  border: none;
+  border-radius: 5px;
+  background: var(--button-background-color);
+  padding: .5em;
+}
+
+.button-row button:hover {
+  background: var(--button-background-hover-color);
+}
+
+.hover-button:hover {
+  color: var(--hover-color-black);
 }
