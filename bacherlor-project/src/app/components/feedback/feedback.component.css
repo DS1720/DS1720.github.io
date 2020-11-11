@@ -28,6 +28,11 @@
 /**
   Overall Container
  */
+.background {
+  background: whitesmoke;
+  width: 100%;
+}
+
 div.feedback-container {
   max-width: 1000px;
   border: whitesmoke solid 10px;
