@@ -47,19 +47,19 @@
     </section>
   </div>
   <section class="student-annotations-container">
-      <div class="error-item" *ngFor="let annotation of annotationTypes">
+      <div class="annotation-item" *ngFor="let annotation of annotationTypes">
         <button [class.active]="annotation==activeAnnotationType && !activeAnnotationPositive" class="{{annotation.split(' ').join('')}}"
-                (click)="changeErrorType(annotation); setActiveAnnotationPositive(false)">
+                (click)="changeAnnotationType(annotation); setActiveAnnotationPositive(false)">
           <div>{{annotation}}</div>
           <div>-</div></button>
         <button [class.active]="annotation==activeAnnotationType && activeAnnotationPositive"
-                (click)="changeErrorType(annotation); setActiveAnnotationPositive(true)"
+                (click)="changeAnnotationType(annotation); setActiveAnnotationPositive(true)"
                 class="positive-annotation">
           +</button>
       </div>
       <div class="split-buttons">
-        <button class="delete" [class.active]="'delete'==activeAnnotationType" (click)="changeErrorType('delete')">Delete Annotation</button>
-        <button class="edit" [class.active]="'edit'==activeAnnotationType" (click)="changeErrorType('edit')">Edit Text</button>
+        <button class="delete" [class.active]="'delete'==activeAnnotationType" (click)="changeAnnotationType('delete')">Delete Annotation</button>
+        <button class="edit" [class.active]="'edit'==activeAnnotationType" (click)="changeAnnotationType('edit')">Edit Text</button>
       </div>
       <div class="split-buttons save-buttons">
         <button class="save" (click)="saveFeedbackAndTranscript()">Save</button>

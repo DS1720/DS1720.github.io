@@ -8,7 +8,7 @@ import { SpeechRecognizerService } from '../../shared/services/web-apis/speech-r
 import { ActionContext } from '../../shared/services/actions/action-context';
 import { SpeechNotification } from '../../shared/model/speech-notification';
 import {Annotation} from '../../shared/Entities/annotation';
-import {StudentErrorType} from '../../shared/Entities/annotation-type';
+import {StudentAnnotationType} from '../../shared/Entities/annotation-type';
 import { faMicrophone, faMicrophoneSlash, faCheckCircle,  faTimesCircle} from '@fortawesome/free-solid-svg-icons';
 import {ActivatedRoute, Router} from '@angular/router';
 import {DataService} from '../../shared/services/data.service';
@@ -16,11 +16,11 @@ import {FeedbackSheet} from '../../shared/Entities/feedback-sheet';
 
 @Component({
   selector: 'wsa-web-speech',
-  templateUrl: './web-speech.component.html',
-  styleUrls: ['./web-speech.component.css'],
+  templateUrl: './transcript-annotation.component.html',
+  styleUrls: ['./transcript-annotation.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class WebSpeechComponent implements OnInit {
+export class TranscriptAnnotationComponent implements OnInit {
 
   faMicrophone = faMicrophone;
   faMicrophoneSlash = faMicrophoneSlash;
@@ -103,7 +103,7 @@ export class WebSpeechComponent implements OnInit {
     } else {
       this.errorMessage$ = of('Your Browser is not supported. Please try Google Chrome.');
     }
-    for (const error of Object.keys(StudentErrorType)) {
+    for (const error of Object.keys(StudentAnnotationType)) {
       this.annotationTypes.push(error);
     }
     this.activeAnnotationType = this.annotationTypes[0];
@@ -119,9 +119,9 @@ export class WebSpeechComponent implements OnInit {
   }
 
   /**
-   * changes type of error
+   * changes type of annotation
    */
-  changeErrorType(type: string): void {
+  changeAnnotationType(type: string): void {
     this.activeAnnotationType = type;
   }
 
@@ -153,9 +153,9 @@ export class WebSpeechComponent implements OnInit {
   /**
    * is called when a word is marked or clicked in transcript
    * calculates indices of click
-   * if errortype is error saves error
-   * if errortype is delete deletes error
-   * if errortype is edit opens edit dialoge
+   * if annotationType is annotation saves annotation
+   * if annotationType is delete deletes annotation
+   * if annotationType is edit opens edit dialoge
    */
   wordClicked(event: Event): void {
     const selection = window.getSelection();
@@ -172,7 +172,7 @@ export class WebSpeechComponent implements OnInit {
       } else { // if more than one word is clicked
         globalIndexes = this.getGlobalIndex(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
       }
-      // if error type is selected save error
+      // if annotation type is selected save annotation
       if (this.activeAnnotationType !== 'delete' && this.activeAnnotationType !== 'edit') {
         this.saveAnnotation(globalIndexes[0], globalIndexes[1],
           this.activeAnnotationType.split(' ').join(''), this.activeAnnotationPositive);
@@ -277,8 +277,8 @@ export class WebSpeechComponent implements OnInit {
    */
   private saveAnnotation(start: number, end: number, annotationType: string, positive: boolean): void {
     const newId = Annotation.getNewId(Annotation.getAnnotationsFromString(this.totalTranscript));
-    this.insertIntoTranscript(end, `<error id="${newId}"/>`);
-    this.insertIntoTranscript(start, `<error id="${newId}" type="${annotationType}" positive="${positive}"/>`);
+    this.insertIntoTranscript(end, `<annotation id="${newId}"/>`);
+    this.insertIntoTranscript(start, `<annotation id="${newId}" type="${annotationType}" positive="${positive}"/>`);
   }
 
   /**
@@ -321,7 +321,6 @@ export class WebSpeechComponent implements OnInit {
       // if position in text minus calculated offset is bigger than first index -> recalculate index
       if (i - offset >= indexes[0] && !firstIndexCalculated) {
         tempIndexes[0] = indexes[0] + offset;
-        console.log('Here');
         firstIndexCalculated = true;
       }
       if (this.totalTranscript[i] === '<') {
@@ -349,8 +348,6 @@ export class WebSpeechComponent implements OnInit {
     const currentAnnotations = Annotation.getAnnotationsFromString(this.totalTranscript);
     const deleteAnnotations: Annotation[] = [];
     let firstAnnotationOutside: Annotation = new Annotation(-1, '', -1, -1, '', -1, -1, false);
-    console.log(startIndex, endIndex);
-    console.log(currentAnnotations);
     // delete all annotations inside
     for (const annotation of currentAnnotations) {
       if (annotation.getStartIndex() >= startIndex && annotation.getEndIndex() <= endIndex) {

@@ -1,7 +1,7 @@
 export class Annotation {
 
-  static regexStartTag = /<error id="\d*" type="\w*" positive="\w*"\/>/;
-  static regexEndTag = /<error id="\d*"\/>/;
+  static regexStartTag = /<annotation id="\d*" type="\w*" positive="\w*"\/>/;
+  static regexEndTag = /<annotation id="\d*"\/>/;
 
   /**
    * returns new annotationId
@@ -23,46 +23,46 @@ export class Annotation {
    * @param text with inserted Annotations
    */
   static getAnnotationsFromString(text: string): Annotation[] {
-    const errors = [];
+    const annotations = [];
     let regex = this.regexStartTag;
     let tempIndex = text.search(regex);
     let offset = 0;
-    // search for all start tags of errors
+    // search for all start tags of annotations
     while (tempIndex !== -1) {
-      // calculate start and end index of error starting tag
+      // calculate start and end index of annotation starting tag
       const beginIndex = offset + tempIndex;
       const endIndex = offset + tempIndex + text.substr(offset + tempIndex).search('>');
       offset = offset + tempIndex + 1;
       tempIndex = text.substr(offset).search(regex);
-      // push found error
-      errors.push(this.getAnnotationFromString(text.substr(beginIndex, endIndex - beginIndex + 1), beginIndex));
+      // push found annotation
+      annotations.push(this.getAnnotationFromString(text.substr(beginIndex, endIndex - beginIndex + 1), beginIndex));
     }
     regex = this.regexEndTag;
     offset = 0;
     tempIndex = text.search(regex);
-    // find all ending tags of errors
+    // find all ending tags of annotations
     while (tempIndex !== -1) {
-      // calculate end index of error
+      // calculate end index of annotation
       const beginIndex = offset + tempIndex;
       const length = text.substr(offset + tempIndex).search('>');
       offset = offset + tempIndex + 1;
       tempIndex = text.substr(offset).search(regex);
       const tempId = this.getIdFromString(text.substr(beginIndex, length));
-      // find error with id of end tag
-      const tempError = errors.filter(x => x.getId() === tempId)[0];
-      if (tempError) {
-        // set end index, text, and back offset of error
-        tempError.setEndIndex(beginIndex + length + 1);
-        tempError.setText(text.substr(tempError.getStartIndex(), tempError.getEndIndex() - tempError.getStartIndex()));
-        tempError.setOffsetBack(tempError.getText().length - tempError.getText().lastIndexOf('<'));
+      // find annotation with id of end tag
+      const tempAnnotation = annotations.filter(x => x.getId() === tempId)[0];
+      if (tempAnnotation) {
+        // set end index, text, and back offset of annotation
+        tempAnnotation.setEndIndex(beginIndex + length + 1);
+        tempAnnotation.setText(text.substr(tempAnnotation.getStartIndex(), tempAnnotation.getEndIndex() - tempAnnotation.getStartIndex()));
+        tempAnnotation.setOffsetBack(tempAnnotation.getText().length - tempAnnotation.getText().lastIndexOf('<'));
       }
     }
-    return errors;
+    return annotations;
   }
 
   /**
-   * returns the id from an error tag
-   * @param text of error tag
+   * returns the id from an annotation tag
+   * @param text of annotation tag
    */
   private static getIdFromString(text: string): number {
     const startIndexId = text.search('id="') + 4;
@@ -97,7 +97,7 @@ export class Annotation {
    * @param text to edit
    */
   static deleteTagsFromOtherAnnotations(id: number, text: string): string {
-    const startTagRegex = '<error id="((?!' + id + ').)*" type="\\w*" positive="\\w*"\\/>';
+    const startTagRegex = '<annotation id="((?!' + id + ').)*" type="\\w*" positive="\\w*"\\/>';
     let startIndex = text.search(startTagRegex);
     // as long as there are foreign tags
     while (startIndex !== -1) {
@@ -111,7 +111,7 @@ export class Annotation {
       text = this.deleteFromText(startIndex, tempEnd, text);
       startIndex = text.search(startTagRegex);
     }
-    const endTagRegex = '<error id="((?!' + id + ').)*"\\/>';
+    const endTagRegex = '<annotation id="((?!' + id + ').)*"\\/>';
     startIndex = text.search(endTagRegex);
     while (startIndex !== -1) {
       // search for end index

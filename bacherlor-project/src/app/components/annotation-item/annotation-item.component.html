@@ -29,7 +29,7 @@
         <fa-icon *ngIf="!edit" [icon]="faArrowCircleRight"></fa-icon>
         <fa-icon *ngIf="edit" (click)="deleteLink(link)" class="trash hover-button" [icon]="faTrash"></fa-icon>
         {{link}}</li>
-      <input *ngIf="edit" list="silos" id="silo-selector" name="silo-selector" [(ngModel)]="selectedLink">
+      <input *ngIf="edit" list="silos" [id]="'silo-selector' + annotationItem.annotation.getId()" name="silo-selector" [(ngModel)]="selectedLink">
       <fa-icon *ngIf="edit" (click)="addLink()" class="hover-button" [icon]="faPlus"></fa-icon>
       <datalist id="silos">
         <option value="a vs. an"></option>

@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { WebSpeechComponent } from './web-speech.component';
+import { TranscriptAnnotationComponent } from './transcript-annotation.component';
 
 describe('WebSpeechComponent', () => {
-  let component: WebSpeechComponent;
-  let fixture: ComponentFixture<WebSpeechComponent>;
+  let component: TranscriptAnnotationComponent;
+  let fixture: ComponentFixture<TranscriptAnnotationComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ WebSpeechComponent ]
+      declarations: [ TranscriptAnnotationComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(WebSpeechComponent);
+    fixture = TestBed.createComponent(TranscriptAnnotationComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

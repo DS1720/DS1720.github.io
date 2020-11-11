@@ -1,4 +1,4 @@
-export enum StudentErrorType {
+export enum StudentAnnotationType {
   pronunciation = 'pronunciation',
   grammar = 'grammar',
   'word choice' = 'word choice',

@@ -8,14 +8,14 @@ import {split} from 'ts-node';
 export class TranscriptFormatPipe implements PipeTransform {
 
   /**
-   * insert spans into transcript with existing error tags
+   * insert spans into transcript with existing annotation tags
    * @param transcript that should be processed
    */
   transform(transcript: string): string {
-    // get all errors
-    const errors = Annotation.getAnnotationsFromString(transcript);
+    // get all annotations
+    const annotations = Annotation.getAnnotationsFromString(transcript);
     // get spans
-    const spans = this.getSpans(errors);
+    const spans = this.getSpans(annotations);
     // insert start and end spans separately with span type and side as class
     for (const span of spans) {
       const positive = span.positive ? 'positive' : '';
@@ -41,19 +41,19 @@ export class TranscriptFormatPipe implements PipeTransform {
 
   /**
    * returns spans in order from back to front
-   * @param errors made in the text
+   * @param annotations made in the text
    */
-  private getSpans(errors: Annotation[]): { index: number, type?: string, id: number, start: boolean, side: string, positive: boolean }[] {
+  private getSpans(annotations: Annotation[]): { index: number, type?: string, id: number, start: boolean, side: string, positive: boolean }[] {
     const spans: {index: number, type?: string, id: number, start: boolean, side: string, positive: boolean}[] = [];
-    // insert a span for every word in error
-    for (const studentError of errors) {
-      const originalText = studentError.getText();
-      const text = originalText.substr(studentError.getOffsetFront(),
-        originalText.length - studentError.getOffsetFront() - studentError.getOffsetBack());
-      // get start index of text in error
-      let currentIndex = studentError.getStartIndex() + studentError.getOffsetFront();
-      // split text fragments from errorTags
-      // splittedText only contains words or errorTags separately
+    // insert a span for every word in annotation
+    for (const studentAnnotation of annotations) {
+      const originalText = studentAnnotation.getText();
+      const text = originalText.substr(studentAnnotation.getOffsetFront(),
+        originalText.length - studentAnnotation.getOffsetFront() - studentAnnotation.getOffsetBack());
+      // get start index of text in annotation
+      let currentIndex = studentAnnotation.getStartIndex() + studentAnnotation.getOffsetFront();
+      // split text fragments from annotationTags
+      // splittedText only contains words or annotationTags separately
       const splittedText = text.split('<');
       for (let i = 0; i < splittedText.length; i++) {
         const tempFragments = (splittedText[i]).split('>');
@@ -63,7 +63,7 @@ export class TranscriptFormatPipe implements PipeTransform {
           i++;
         }
       }
-      // split every word that is not errorTag without losing spaces
+      // split every word that is not annotationTag without losing spaces
       for (let i = 0; i < splittedText.length; i++) {
         if (splittedText[i].search('<') === -1) {
           const tempFragments = (splittedText[i]).split(' ');
@@ -92,45 +92,45 @@ export class TranscriptFormatPipe implements PipeTransform {
           }
         }
       }
-      const spansErrorStart: { index: number, type?: string, id: number, start: boolean, side: string, positive: boolean }[] = [];
-      const spansErrorEnd: { index: number, type?: string, id: number, start: boolean, side: string, positive: boolean }[] = [];
+      const spansAnnotationStart: { index: number, type?: string, id: number, start: boolean, side: string, positive: boolean }[] = [];
+      const spansAnnotationEnd: { index: number, type?: string, id: number, start: boolean, side: string, positive: boolean }[] = [];
       for (const originalTextFragment of splittedText) {
         // Start Tag
-        const regexStart = /<error id="\d*" type="\w*"\/>/;
-        const regexEnd = /<error id="\d*"\/>/;
+        const regexStart = /<annotation id="\d*" type="\w*"\/>/;
+        const regexEnd = /<annotation id="\d*"\/>/;
         const isStartTag = originalTextFragment.search(regexStart) !== -1;
         const isEndTag = originalTextFragment.search(regexEnd) !== -1;
         // only insert if fragment is no start or end Tag and is not Empty
         if (!(isStartTag || isEndTag) && originalTextFragment !== '') {
-          spansErrorStart.push({
+          spansAnnotationStart.push({
             index: currentIndex,
-            type: studentError.getType(),
-            id: studentError.getId(),
+            type: studentAnnotation.getType(),
+            id: studentAnnotation.getId(),
             start: true,
             side: '',
-            positive: studentError.getPositive()
+            positive: studentAnnotation.getPositive()
           });
-          spansErrorEnd.push({
+          spansAnnotationEnd.push({
             index: currentIndex + originalTextFragment.length,
-            type: studentError.getType(),
-            id: studentError.getId(),
+            type: studentAnnotation.getType(),
+            id: studentAnnotation.getId(),
             start: false,
             side: '',
-            positive: studentError.getPositive()
+            positive: studentAnnotation.getPositive()
           });
         }
         // add processed Text to current Index
         currentIndex += originalTextFragment.length;
       }
       // if only one word was processed add left and right border
-      if (spansErrorStart.length === 1) {
-        spansErrorStart[0].side = 'left right';
-      } else if (spansErrorStart.length > 0) { // if more than one word was processed
-        spansErrorStart[0].side = 'left'; // add left border for first word
-        spansErrorStart[spansErrorStart.length - 1].side = 'right'; // add right border for last word
+      if (spansAnnotationStart.length === 1) {
+        spansAnnotationStart[0].side = 'left right';
+      } else if (spansAnnotationStart.length > 0) { // if more than one word was processed
+        spansAnnotationStart[0].side = 'left'; // add left border for first word
+        spansAnnotationStart[spansAnnotationStart.length - 1].side = 'right'; // add right border for last word
       }
-      spansErrorStart.forEach(span => spans.push(span));
-      spansErrorEnd.forEach(span => spans.push(span));
+      spansAnnotationStart.forEach(span => spans.push(span));
+      spansAnnotationEnd.forEach(span => spans.push(span));
     }
     // sort spans that they are returned backwards
     spans.sort((a, b) => {

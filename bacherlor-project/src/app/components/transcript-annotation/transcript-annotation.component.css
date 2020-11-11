@@ -1,6 +1,6 @@
 /*
 -------------
-    Errors
+    Annotations
   --pronunciation-color: #ffd500;
   --grammar-color: #ec7134;
   --wordchoice-color: #ff009b;
@@ -162,10 +162,10 @@ textarea.notes-text-container {
 }
 
 /*
-  Error Buttons
+  Annotation Buttons
  */
 
-.error-item, .student-annotations-container .split-buttons {
+.annotation-item, .student-annotations-container .split-buttons {
   height: 100%;
   margin-bottom: 1rem;
   margin-right: 1rem;
@@ -183,7 +183,7 @@ textarea.notes-text-container {
   overflow-x: hidden;
 }
 
-.student-annotations-container .error-item button:first-child {
+.student-annotations-container .annotation-item button:first-child {
   width: 75%;
   border-top-right-radius: 0px;
   border-bottom-right-radius: 0px;
@@ -192,17 +192,17 @@ textarea.notes-text-container {
   align-items: center;
 }
 
-.student-annotations-container .error-item button:first-child div:first-child {
+.student-annotations-container .annotation-item button:first-child div:first-child {
   width: 75%;
   color: white;
 }
 
-.student-annotations-container .error-item button:first-child div:last-child {
+.student-annotations-container .annotation-item button:first-child div:last-child {
   width: 25%;
   padding-left: 20px;
 }
 
-.student-annotations-container .error-item button:last-child {
+.student-annotations-container .annotation-item button:last-child {
   width: 25%;
   padding-left: 20px;
   border-top-left-radius: 0px;
@@ -217,19 +217,19 @@ textarea.notes-text-container {
   transition: background-position 0.5s, color 0.5s;
 }
 
-.student-annotations-container .error-item button:first-child {
+.student-annotations-container .annotation-item button:first-child {
   background-size: 200% 100%;
   background-repeat: repeat-x;
   background-position: calc(-70% + 20px) 100%;
   transition: background-position 0.5s, color 0.5s;
 }
 
-.student-annotations-container button:hover, .student-annotations-container .error-item button:first-child:hover {
+.student-annotations-container button:hover, .student-annotations-container .annotation-item button:first-child:hover {
   background-position: calc(-100% - 20px);
   color: white;
 }
 
-.student-annotations-container button.active, .student-annotations-container .error-item button:first-child.active {
+.student-annotations-container button.active, .student-annotations-container .annotation-item button:first-child.active {
   background-position: -100%;
   color: white;
 }
