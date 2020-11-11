@@ -5,6 +5,7 @@ import {SharedModule} from '../../shared/shared.module';
 import {FormsModule} from '@angular/forms';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
+import {BdcWalkModule} from 'bdc-walkthrough';
 
 
 @NgModule({
@@ -12,12 +13,13 @@ import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
     exports: [
         TranscriptAnnotationComponent
     ],
-    imports: [
-        CommonModule,
-        SharedModule,
-        FormsModule,
-        MatTooltipModule,
-        FontAwesomeModule
-    ]
+  imports: [
+    CommonModule,
+    SharedModule,
+    FormsModule,
+    MatTooltipModule,
+    FontAwesomeModule,
+    BdcWalkModule
+  ]
 })
 export class TranscriptAnnotation { }

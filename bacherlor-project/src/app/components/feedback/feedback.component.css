@@ -203,3 +203,16 @@ h3.grammar, h3.wordchoice, h3.tense {
 .hover-button:hover {
   color: var(--hover-color-black);
 }
+
+.center {
+  text-align: center;
+}
+
+.button-grey {
+  background: rgb(215, 215, 215) !important;
+}
+
+.button-grey:hover {
+  background: rgb(141, 141, 141) !important;
+}
+

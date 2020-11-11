@@ -1,5 +1,6 @@
-<section>
-  <div *ngIf="errorMessage$| async as errorMessage" class="notification">{{errorMessage}}</div>
+<section *ngIf="errorMessage$| async as errorMessage" class="error-message">
+  <button><fa-icon (click)="endErrorMsg()" [icon]="faCheckCircle"></fa-icon></button>
+  <div class="notification">{{errorMessage}}</div>
 </section>
 
 <section *ngIf="showEditPopup" class="edit-transcript-container popup">
@@ -15,13 +16,13 @@
 
 <div id="grid">
   <div class="properties-container">
-    <section class="student-properties-container">
+    <section [bdcWalkTriggerFor]="welcome" [enabled]="tutorial" class="student-properties-container">
       <div>
         <h1>{{activeStudent.name}}</h1>
         {{exam.name}} | {{activeStudent.course}}
       </div>
       <div class="record-button" *ngIf="!edit">
-        <button (click)="toggleListening()" [class.active]="listening()">
+        <button [bdcWalkTriggerFor]="recordButton" [enabled]="tutorial" (click)="toggleListening()" [class.active]="listening()">
           <fa-icon *ngIf="listening()" [icon]="faMicrophone"></fa-icon>
           <fa-icon *ngIf="!listening()" [icon]="faMicrophoneSlash"></fa-icon>
         </button>
@@ -33,8 +34,8 @@
     </section>
     <section class="transcript-container">
       <label for="full-transcript">Full Transcript</label>
-      <div id="full-transcript">
-        <span class="showSpaces transcipt" (click)="wordClicked($event)"
+      <div [bdcWalkTriggerFor]="deleteAnnotation2" [enabled]="tutorial" id="full-transcript">
+        <span [bdcWalkTriggerFor]="annotate" [enabled]="tutorial" class="showSpaces transcipt" (click)="wordClicked($event)"
               [innerHTML]="totalTranscript | transcriptFormat"></span>
         <span [class.hide]="!showTemporaryText()" id="temporaryText">{{transcript$ | async}}</span>
       </div>
@@ -47,7 +48,7 @@
     </section>
   </div>
   <section class="student-annotations-container">
-      <div class="annotation-item" *ngFor="let annotation of annotationTypes">
+      <div [bdcWalkTriggerFor]="selectAnnotationType" [enabled]="annotation == 'grammar' && tutorial"  class="annotation-item" *ngFor="let annotation of annotationTypes">
         <button [class.active]="annotation==activeAnnotationType && !activeAnnotationPositive" class="{{annotation.split(' ').join('')}}"
                 (click)="changeAnnotationType(annotation); setActiveAnnotationPositive(false)">
           <div>{{annotation}}</div>
@@ -58,15 +59,59 @@
           +</button>
       </div>
       <div class="split-buttons">
-        <button class="delete" [class.active]="'delete'==activeAnnotationType" (click)="changeAnnotationType('delete')">Delete Annotation</button>
-        <button class="edit" [class.active]="'edit'==activeAnnotationType" (click)="changeAnnotationType('edit')">Edit Text</button>
+        <button [bdcWalkTriggerFor]="deleteAnnotation" [enabled]="tutorial" class="delete" [class.active]="'delete'==activeAnnotationType" (click)="changeAnnotationType('delete')">Delete Annotation</button>
+        <button [bdcWalkTriggerFor]="editWalkthrough" [enabled]="tutorial" class="edit" [class.active]="'edit'==activeAnnotationType" (click)="changeAnnotationType('edit')">Edit Text</button>
       </div>
       <div class="split-buttons save-buttons">
         <button class="save" (click)="saveFeedbackAndTranscript()">Save</button>
-        <button class="save" (click)="saveAndRouteToFeedback()">
+        <button [bdcWalkTriggerFor]="continueFeedbackWalkthrough" [enabled]="tutorial" class="save" (click)="saveAndRouteToFeedback()">
           <span *ngIf="!edit">Save & Exit</span>
           <span *ngIf="edit">go to Feedback</span>
         </button>
       </div>
   </section>
 </div>
+
+<bdc-walk-popup #welcome name="welcome" header="Welcome" [arrow]="false" sideNoteText="1/15" xPosition="before" [showButton]="true" buttonText="Let's start" [closeOnClick]="true" [onButtonCompleteTask]="{welcome: true}">
+  To make your life easier we would like to show you a short tutorial.
+</bdc-walk-popup>
+
+<bdc-walk-popup #recordButton name="recordButton" header="Record Button" xPosition="after" [horizontal]="true" sideNoteText="2/15" [mustCompleted]="{welcome: true}" [closeOnClick]="false" [showButton]="true" [onButtonCompleteTask]="{recordButton: true}">
+  After <b>clicking</b> this Button your Program starts to <b>transcript</b> everything a student says.
+  <br><br>
+  For this tutorial we have <b>already recorded</b> a text,  which you can see below.
+</bdc-walk-popup>
+
+<bdc-walk-popup #annotate name="annotate" sideNoteText="3/15" yPosition="below" xPosition="after" header="Annotate in Transcript" [mustCompleted]="{recordButton: true}" [closeOnClick]="true" [onButtonCompleteTask]="{annotate: true}">
+  To make <b>annotations</b> in transcript, simply <b>press</b> on the word you want to annotate or <b>hold your left mouse button</b> and mark several words.
+  <br> <br>
+  <b> Mark</b> one or several <b>words</b> to continue!
+</bdc-walk-popup>
+
+<bdc-walk-popup #selectAnnotationType name="selectAnnotationType" sideNoteText="4/15" yPosition="below" xPosition="after" header="Select another Type" [horizontal]="true" [mustCompleted]="{annotate: true}" [closeOnClick]="true" [onButtonCompleteTask]="{selectAnnotationType: true}">
+  To select <b>another type</b> of annotations just click on one of these buttons on the right. You can also choose between <b>negative annotations</b> on the left side and <b>positive</b> on the right side marked in green.
+  <br> <br>
+  Select the <b>grammar button </b> to continue!
+</bdc-walk-popup>
+
+<bdc-walk-popup #deleteAnnotation name="deleteAnnotation" sideNoteText="5/15" yPosition="below" xPosition="after" header="Delete Annotations" [mustCompleted]="{selectAnnotationType: true}" [closeOnClick]="true" [onButtonCompleteTask]="{deleteAnnotation: true}">
+  To <b>delete</b> Annotations first select the <b>delete annotation</b> button...
+  <br> <br>
+  Select the <b> delete button </b> to continue!
+</bdc-walk-popup>
+
+<bdc-walk-popup #deleteAnnotation2 name="deleteAnnotation2" sideNoteText="6/15" yPosition="above" xPosition="after" header="Delete Annotations" [mustCompleted]="{deleteAnnotation: true}" [closeOnClick]="true" [onButtonCompleteTask]="{deleteAnnotation2: true}">
+  ...now <b>click</b> on one annotation to <b>delete</b> it.
+  <br> <br>
+  <b>Delete</b> an annotation to continue!
+</bdc-walk-popup>
+
+<bdc-walk-popup #editWalkthrough name="editWalkthrough" sideNoteText="7/15" yPosition="above" xPosition="before" header="Edit Transcript" [mustCompleted]="{deleteAnnotation2: true}" [showButton]="true" [onButtonCompleteTask]="{editWalkthrough: true}">
+  If the <b>speech recognition</b> made a mistake you can <b>edit</b> the transcript by selecting this button. Then <b>mark</b> the word(s) you want to edit in transcript.
+</bdc-walk-popup>
+
+<bdc-walk-popup #continueFeedbackWalkthrough name="continueFeedbackWalkthrough" sideNoteText="15/15" yPosition="above" xPosition="before" header="End Exam" [mustCompleted]="{editWalkthrough: true, transcript: false}" [onButtonCompleteTask]="{continueFeedbackWalkthrough: true}">
+  After the <b>exam</b> is <b>finished</b> it´s time to see how to give your students <b>feedback</b>.
+  <br> <br>
+  To continue <b>click</b> on the <b>save & exit</b> button!
+</bdc-walk-popup>

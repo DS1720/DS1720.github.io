@@ -10,6 +10,8 @@ import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import { FeedbackComponent } from './components/feedback/feedback.component';
 import { AnnotationItemComponent } from './components/annotation-item/annotation-item.component';
 import {FormsModule} from '@angular/forms';
+import {BdcWalkModule} from 'bdc-walkthrough';
+import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
@@ -24,7 +26,9 @@ import {FormsModule} from '@angular/forms';
     SharedModule,
     TranscriptAnnotation,
     FontAwesomeModule,
-    FormsModule
+    FormsModule,
+    BdcWalkModule,
+    NgbTooltipModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -1,14 +1,23 @@
 <div class="edit-mode-button">
   <div class="button-container">
-    <button (click)="toggleEdit()">
+    <button type="button"
+            [bdcWalkTriggerFor]="studentView"
+            [enabled]="pointsAwarded() && tutorial"
+            (click)="toggleEdit()">
       <span *ngIf="edit"><fa-icon [icon]="faUserGraduate"></fa-icon> go to student view</span>
       <span *ngIf="!edit"><fa-icon [icon]="faEdit"></fa-icon> go to edit mode</span>
     </button>
-    <button (click)="save()">
+    <button ngbTooltip="Disabled in Tutorial"
+            [disableTooltip]="!tutorial"
+            placement="left"
+            (click)="save()">
       <fa-icon [icon]="faSave"></fa-icon>
       Save
     </button>
-    <button (click)="saveAndExit()">
+    <button ngbTooltip="Disabled in Tutorial"
+            [disableTooltip]="!tutorial"
+            placement="right"
+            [bdcWalkTriggerFor]="saveAnnotation" [enabled]="tutorial" (click)="saveAndExit()">
       <fa-icon [icon]="faSignOutAlt"></fa-icon>
       Save & Exit
     </button>
@@ -26,7 +35,8 @@
   <section id="transcript" class="spaces">
     <label for="transcript">
       <h2>
-        <fa-icon class="hover-button" (click)="editTranscript()" [icon]="faEdit" *ngIf="edit"></fa-icon>
+        <fa-icon ngbTooltip="Disabled in Tutorial"
+                 [disableTooltip]="!tutorial" class="hover-button" (click)="editTranscript()" [icon]="faEdit" *ngIf="edit"></fa-icon>
         Recorded Transcript:
       </h2>
       <div class="legend">Annotation-Types:
@@ -38,7 +48,7 @@
       </div>
     </label>
     <div class="transcript-container">
-      <div class="transcript spaces" [class.show-transcript]="showTranscript"
+      <div [bdcWalkTriggerFor]="transcript" [enabled]="tutorial" class="transcript spaces" [class.show-transcript]="showTranscript"
            [innerHTML]="feedbackSheet.getTranscript() | transcriptFormat">
       </div>
       <div class="white" [class.white-hidden]="showTranscript"></div>
@@ -54,13 +64,13 @@
   </section>
 
   <section id="annotations">
-    <label for="annotations"><h2>Annotations:</h2></label>
+    <label for="annotations" [bdcWalkTriggerFor]="annotations" [enabled]="tutorial"><h2>Annotations:</h2></label>
     <span class="annotation-items-container" *ngIf="countAnnotationItems('pronunciation') > 0">
       <h3 class="pronunciation">Pronunciation:</h3>
       <span class="annotation-item" *ngFor="let annotationItem of feedbackSheet.getAnnotations()">
         <wsa-annotation-item *ngIf="annotationItem.annotation.getType() == 'pronunciation'"
                               [annotationItem]="annotationItem"
-                              [edit]="edit"></wsa-annotation-item>
+                              [edit]="edit" [bdcWalkTriggerFor]="comment" [enabled]="tutorial"></wsa-annotation-item>
       </span>
     </span>
     <span class="annotation-items-container" *ngIf="countAnnotationItems('grammar') > 0">
@@ -91,7 +101,7 @@
   <section id="notes-container" *ngIf="feedbackSheet.getFeedbackNotes() != '' || edit">
     <label for="annotations"><h2>Notes from Examiner:</h2></label>
     <span *ngIf="!edit">{{feedbackSheet.getFeedbackNotes()}}</span>
-    <textarea placeholder="insert notes..." *ngIf="edit" [ngModel]="feedbackSheet.getFeedbackNotes()"
+    <textarea [bdcWalkTriggerFor]="notes" [enabled]="tutorial" placeholder="insert notes..." *ngIf="edit" [ngModel]="feedbackSheet.getFeedbackNotes()"
               (ngModelChange)="feedbackSheet.setFeedbackNotes($event)"></textarea>
   </section>
   <section id="points">
@@ -99,19 +109,78 @@
       <h1 class="inline">
         <span *ngIf="edit"><input type="number" min="0"
                                   [max]="feedbackSheet.getExam().maxPoints"
-                                  [(ngModel)]="feedbackSheet.getExam().reachedPoints"></span>
+                                  [(ngModel)]="feedbackSheet.getExam().reachedPoints"
+                                  [bdcWalkTriggerFor]="points"
+                                  [enabled]="!pointsAwarded() && tutorial"></span>
         <span *ngIf="!edit">{{feedbackSheet.getExam().reachedPoints}}</span>
         /{{feedbackSheet.getExam().maxPoints}}</h1>
     </label>
   </section>
   <div class="button-row">
-    <button *ngIf="!edit" (click)="routeToExam(false)">
+    <button
+      ngbTooltip="Disabled in Tutorial"
+      [disableTooltip]="!tutorial"
+      *ngIf="!edit" (click)="routeToExam(false)">
       <fa-icon [icon]="faHome"></fa-icon>
       Return to Home
     </button>
-    <button *ngIf="edit" (click)="saveAndExit()">
+    <button ngbTooltip="Disabled in Tutorial"
+            [disableTooltip]="!tutorial"
+            *ngIf="edit" (click)="saveAndExit()">
       <fa-icon [icon]="faSignOutAlt"></fa-icon>
       Save & Exit
     </button>
   </div>
 </div>
+
+<bdc-walk-popup #transcript name="transcript" header="Recorded Transcript" sideNoteText="9/15" xPosition="before" yPosition="above" [showButton]="true" [closeOnClick]="true" [onButtonCompleteTask]="{transcript: true}">
+  Here´s your recorded and annotated transcript. You can <b>edit</b> it by <b>clicking</b> on the <b>edit button</b> next to the heading <i>Recorded Transcript</i> and <b>expand</b> it by clicking on the <b>plus</b> below.
+</bdc-walk-popup>
+
+<bdc-walk-popup #annotations name="annotations" header="Saved Annotations" sideNoteText="10/15" xPosition="after" yPosition="above" [showButton]="true" [closeOnClick]="true" [mustCompleted]="{transcript: true}" [onButtonCompleteTask]="{annotations: true}">
+  Here you see every single <b>Annotation</b> you have made in the <b>transcript</b> before.
+</bdc-walk-popup>
+
+<bdc-walk-popup #comment name="comment" header="Comments and Lessons" sideNoteText="11/15" xPosition="before" yPosition="below" [showButton]="true" [closeOnClick]="true" [mustCompleted]="{annotations: true}" [onButtonCompleteTask]="{comment: true}">
+  In the annotations you can leave <b>specific comments</b> for your annotations and add useful <b>learning lessons</b> from your silos.
+  <br> <br>
+  <b>The Tutorial continues on the bottom of the Annotation Section!</b>
+</bdc-walk-popup>
+
+<bdc-walk-popup #notes name="notes"  sideNoteText="12/15"header="Notes" xPosition="before" yPosition="above" [showButton]="true" [closeOnClick]="true" [mustCompleted]="{comment: true}" [onButtonCompleteTask]="{notes: true}">
+  In this section you can leave <b>general Notes</b> on the exam for the Student.
+</bdc-walk-popup>
+
+<bdc-walk-popup #points name="points" sideNoteText="13/15" header="Points" xPosition="before" yPosition="above" [mustCompleted]="{notes: true}">
+  After giving Feedback to your Student you have to <b>award Points</b> for the exam.
+  <br> <br>
+  To continue this tutorial award <b>100 Points</b> for the exam.
+</bdc-walk-popup>
+
+<bdc-walk-popup #studentView name="studentView" sideNoteText="14/15" header="Go To Student View" xPosition="before" yPosition="above" [closeOnClick]="true" [mustCompleted]="{notes: true}" [onButtonCompleteTask]="{studentView: true}">
+  To see how your feedback is seen by the <b>student</b> you can click on the <b>go to student view</b> button.
+  <br> <br>
+  To continue click on <b>go to student view</b>.
+</bdc-walk-popup>
+
+<bdc-walk-popup #saveAnnotation name="saveAnnotation" header="Edit, Save & Exit" sideNoteText="15/15" xPosition="before" yPosition="above" [showButton]="true" [closeOnClick]="true" [mustCompleted]="{studentView: true}" [onButtonCompleteTask]="{saveAnnotation: true}">
+  After looking through the feedback you can go <b>back to edit mode</b> by clicking on the button on the left.
+  To <b>exit</b> the grading you click on the <b>save & exit</b> button.
+</bdc-walk-popup>
+
+<bdc-walk-dialog #end name="end" width="400px" [mustCompleted]="{saveAnnotation: true}">
+  <h1 class="center">
+    Finished!
+  </h1>
+
+  <p class="center">
+    Congratulations! You've successfully finished the tutorial!
+  </p>
+
+  <div class="button-row">
+    <button
+      class="button-grey" (click)="end.close({end: false}); reset(); finishTutorial(); routeToExam(false)">
+      <fa-icon [icon]="faHome"></fa-icon>
+      Go Back to Home</button>
+  </div>
+</bdc-walk-dialog>

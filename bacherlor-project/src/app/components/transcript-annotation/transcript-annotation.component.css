@@ -8,6 +8,20 @@
 -------------
  */
 
+/*
+  Error Message
+ */
+.error-message {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  margin-top: 5px;
+  transform: translateX(-50%);
+  border: 5px solid var(--error-background);
+  padding: 1em;
+  background: white;
+}
+
 
 /*
   Grid/Flexbox Styles
@@ -105,7 +119,6 @@
   margin: 0rem 1rem 0rem 0rem;
   font-size: 1.3em;
   border: solid 1px #333;
-  border-radius: 5px;
   line-height: 1.3em;
 }
 
@@ -143,7 +156,6 @@ textarea.notes-text-container {
   overflow-y: auto;
   resize: none;
   border: 1px solid black;
-  border-radius: 5px;
   padding: 1em;
   height: 100%;
 }

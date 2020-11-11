@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { merge, Observable, of, Subject } from 'rxjs';
+import {merge, Observable, of, Subject, Subscription} from 'rxjs';
 import {count, map, tap} from 'rxjs/operators';
 import { defaultLanguage, languages } from '../../shared/model/languages';
 import { SpeechError } from '../../shared/model/speech-error';
@@ -13,9 +13,10 @@ import { faMicrophone, faMicrophoneSlash, faCheckCircle,  faTimesCircle} from '@
 import {ActivatedRoute, Router} from '@angular/router';
 import {DataService} from '../../shared/services/data.service';
 import {FeedbackSheet} from '../../shared/Entities/feedback-sheet';
+import {BdcWalkService} from 'bdc-walkthrough';
 
 @Component({
-  selector: 'wsa-web-speech',
+  selector: 'wsa-transcript-annotation',
   templateUrl: './transcript-annotation.component.html',
   styleUrls: ['./transcript-annotation.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -28,22 +29,6 @@ export class TranscriptAnnotationComponent implements OnInit {
   faTimesCircle = faTimesCircle;
 
   transcriptToShow = 'Flamingos usually stand on one leg, with the other being tucked beneath the body. ' +
-    'The reason for this behaviour is not fully understood. One theory is that standing on one leg allows the ' +
-    'birds to conserve more body heat, given that they spend a significant amount of time wading in cold water. ' +
-    'However, the behaviour also takes place in warm water and is also observed in birds that do not typically stand in water. ' +
-    'An alternative theory is that standing on one leg reduces the energy expenditure for producing muscular effort to ' +
-    'stand and balance on one leg. A study on cadavers showed that the one-legged pose could be held without any ' +
-    'muscle activity, while living flamingos demonstrate substantially less body sway in a one-legged posture. ' +
-    'As well as standing in the water, flamingos may stamp their webbed feet in the mud to stir up food from the bottom. ' +
-    'Flamingos are capable flyers, and flamingos in captivity often require wing clipping to prevent escape. ' +
-    'A pair of African flamingos which had not yet had their wings clipped escaped from the Wichita, Kansas zoo in 2005. ' +
-    'One was spotted in Texas 14 years later. Young flamingos hatch with grayish-red plumage, but adults range from ' +
-    'light pink to bright red due to aqueous bacteria and beta-carotene obtained from their food supply. A well-fed, ' +
-    'healthy flamingo is more vibrantly colored, thus a more desirable mate; a white or pale flamingo, however, is usually ' +
-    'unhealthy or malnourished. Captive flamingos are a notable exception; they may turn a pale pink if they are not fed ' +
-    'carotene at levels comparable to the wild. Flamingoes can open their bills by raising the upper jaw as well as by ' +
-    'dropping the lower.' +
-    'Flamingos usually stand on one leg, with the other being tucked beneath the body. ' +
     'The reason for this behaviour is not fully understood. One theory is that standing on one leg allows the ' +
     'birds to conserve more body heat, given that they spend a significant amount of time wading in cold water. ' +
     'However, the behaviour also takes place in warm water and is also observed in birds that do not typically stand in water. ' +
@@ -83,20 +68,37 @@ export class TranscriptAnnotationComponent implements OnInit {
   feedback = '';
   editTextIndexes: number[] = [-1, -1];
   inserted = '';
+  showErrorMsg = false;
+  tutorial = false;
+
+  // Walkthrough
+  id = 'transcriptWalkthorugh';
+  visible = true;
+  componentSubscription: Subscription | undefined;
+  tasks = [
+    {name: 'recordButton', title: 'This is the Record Button', done: false},
+    {name: 'annotate', title: 'Annotate in Transcript', done: false},
+    {name: 'selectAnnotationType', title: 'Annotate in Transcript', done: false},
+    {name: 'deleteAnnotation', title: 'Delete Annotation', done: false},
+    {name: 'deleteAnnotation2', title: 'Delete Annotation', done: false},
+    {name: 'editWalkthrough', title: 'Edit Transcript', done: false}
+  ];
 
   constructor(
     private speechRecognizer: SpeechRecognizerService,
     private actionContext: ActionContext,
     private router: Router,
     private dataService: DataService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private bdcWalkService: BdcWalkService
   ) {
   }
 
   ngOnInit(): void {
     this.edit = this.route.snapshot.queryParamMap.get('edit') ? this.route.snapshot.queryParamMap.get('edit') === 'true' : false;
-    // this.totalTranscript = '';
-    this.totalTranscript = this.transcriptToShow;
+    this.tutorial = this.route.snapshot.queryParamMap.get('tutorial')
+      ? this.route.snapshot.queryParamMap.get('tutorial') === 'true' : false;
+    this.totalTranscript = '';
     const webSpeechReady = this.speechRecognizer.initialize(this.currentLanguage);
     if (webSpeechReady) {
       this.initRecognition();
@@ -116,6 +118,41 @@ export class TranscriptAnnotationComponent implements OnInit {
     } else {
       this.feedbackSheet = new FeedbackSheet(this.activeStudent, this.exam, this.totalTranscript, '', []);
     }
+
+    // walkthrough
+    if (this.tutorial) {
+      this.totalTranscript = this.transcriptToShow;
+      this.componentSubscription = this.bdcWalkService.changes.subscribe(() => this.onTaskChanges());
+    }
+  }
+
+  // tslint:disable-next-line:typedef use-lifecycle-interface
+  ngOnDestroy() {
+    if (this.componentSubscription !== undefined) {
+      this.componentSubscription.unsubscribe();
+    }
+  }
+
+  /**
+   * Refresh the Status of each walkthrough task
+   */
+  onTaskChanges(): void {
+    this.tasks.forEach(task => task.done = this.bdcWalkService.getTaskCompleted(task.name));
+    this.visible = this.bdcWalkService.getTaskCompleted(this.id);
+  }
+
+  /**
+   * Toogles task visible boolean
+   */
+  toggleShowWalkthough(visible: boolean): void {
+    this.bdcWalkService.setTaskCompleted(this.id, visible);
+  }
+
+  /**
+   * resets the walkthrough
+   */
+  reset(): void {
+    this.bdcWalkService.reset();
   }
 
   /**
@@ -147,7 +184,12 @@ export class TranscriptAnnotationComponent implements OnInit {
    */
   saveAndRouteToFeedback(): void {
     this.saveFeedbackAndTranscript();
-    this.router.navigate(['/feedback']);
+    if (this.tutorial) {
+      this.reset();
+      this.router.navigate(['/feedback'], {queryParams: {tutorial: true}});
+    } else {
+      this.router.navigate(['/feedback']);
+    }
   }
 
   /**
@@ -403,7 +445,7 @@ export class TranscriptAnnotationComponent implements OnInit {
    * @param endIndex of last letter deleted
    */
   private deleteFromTranscript(startIndex: number, endIndex: number): void {
-    if(startIndex >= 0 && endIndex >= 0 && startIndex <= endIndex) {
+    if (startIndex >= 0 && endIndex >= 0 && startIndex <= endIndex) {
       this.totalTranscript = this.totalTranscript.substr(0, startIndex) +
         this.totalTranscript.substr(endIndex);
     }
@@ -500,7 +542,7 @@ export class TranscriptAnnotationComponent implements OnInit {
             message = `Microphone is not available. Please verify the connection of your microphone and try again.`;
             break;
           default:
-            message = '';
+            message = 'An error occured.';
             break;
         }
         return message;
@@ -524,6 +566,10 @@ export class TranscriptAnnotationComponent implements OnInit {
   }
 
   listening(): boolean {
-    return this.isListening;
+    return this.speechRecognizer.isListening;
+  }
+
+  endErrorMsg(): void {
+
   }
 }
