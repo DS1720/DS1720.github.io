@@ -11,13 +11,15 @@ import { FeedbackComponent } from './components/feedback/feedback.component';
 import { AnnotationItemComponent } from './components/annotation-item/annotation-item.component';
 import {FormsModule} from '@angular/forms';
 import {BdcWalkModule} from 'bdc-walkthrough';
-import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbTooltipModule, NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
+import { ToastGlobalComponent } from './components/toast-global/toast-global.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     FeedbackComponent,
-    AnnotationItemComponent
+    AnnotationItemComponent,
+    ToastGlobalComponent
   ],
   imports: [
     BrowserModule,
@@ -28,7 +30,8 @@ import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
     FontAwesomeModule,
     FormsModule,
     BdcWalkModule,
-    NgbTooltipModule
+    NgbTooltipModule,
+    NgbToastModule
   ],
   providers: [],
   bootstrap: [AppComponent]

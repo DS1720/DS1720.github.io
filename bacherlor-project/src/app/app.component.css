@@ -12,6 +12,7 @@
   --wordchoice-color: #032340;
   --tense-color: #7C9EB2;
   --positive-color: #1f672e;
+  --positive-color-background: rgba(31, 103, 46, 0.5);
   --negative-color: #d74040;
   --error-background: #bc3a3a;
   --delete-color: black;
@@ -88,11 +89,14 @@
 }
 
 :host /deep/ span.positive {
-  border-top: 2px solid var(--positive-color);
-  border-bottom: 2px solid var(--positive-color);
+  background-color: var(--positive-color-background);
+  color: black;
+  /*border-top: 2px solid var(--positive-color);
+  border-bottom: 2px solid var(--positive-color);*/
   display: inline-block;
 }
 
+/*
 :host /deep/ span.positive.right {
   border-right: 2px solid var(--positive-color);
 }
@@ -100,3 +104,5 @@
 :host /deep/ span.positive.left {
   border-left: 2px solid var(--positive-color);
 }
+
+ */

@@ -12,6 +12,7 @@
   Error Message
  */
 .error-message {
+  display: none;
   position: absolute;
   top: 0;
   left: 50%;

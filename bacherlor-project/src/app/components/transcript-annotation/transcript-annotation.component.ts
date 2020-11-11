@@ -14,6 +14,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {DataService} from '../../shared/services/data.service';
 import {FeedbackSheet} from '../../shared/Entities/feedback-sheet';
 import {BdcWalkService} from 'bdc-walkthrough';
+import {ToastService} from '../../shared/services/toast.service';
 
 @Component({
   selector: 'wsa-transcript-annotation',
@@ -90,7 +91,8 @@ export class TranscriptAnnotationComponent implements OnInit {
     private router: Router,
     private dataService: DataService,
     private route: ActivatedRoute,
-    private bdcWalkService: BdcWalkService
+    private bdcWalkService: BdcWalkService,
+    private toastService: ToastService
   ) {
   }
 
@@ -104,6 +106,7 @@ export class TranscriptAnnotationComponent implements OnInit {
       this.initRecognition();
     } else {
       this.errorMessage$ = of('Your Browser is not supported. Please try Google Chrome.');
+      this.toastService.show('error', 'Your Browser is not supported. Please try Google Chrome.');
     }
     for (const error of Object.keys(StudentAnnotationType)) {
       this.annotationTypes.push(error);
@@ -462,7 +465,11 @@ export class TranscriptAnnotationComponent implements OnInit {
       if (recordedText[0] === ' ') {
         recordedText = recordedText.substr(1, recordedText.length - 1);
       }
-      if (recordedText === this.inserted) {
+      let insertedText = this.inserted;
+      if (insertedText[0] === ' ') {
+        insertedText = insertedText.substr(1, insertedText.length - 1);
+      }
+      if (recordedText === insertedText) {
         return false;
       }
     }
@@ -534,15 +541,19 @@ export class TranscriptAnnotationComponent implements OnInit {
           case SpeechError.NotAllowed:
             message = `Your browser is not authorized to access your microphone.
             Verify that your browser has access to your microphone and try again.`;
+            this.toastService.show('error', message);
             break;
           case SpeechError.NoSpeech:
             message = `No speech has been detected. Please try again.`;
+            this.toastService.show('error', message);
             break;
           case SpeechError.AudioCapture:
             message = `Microphone is not available. Please verify the connection of your microphone and try again.`;
+            this.toastService.show('error', message);
             break;
           default:
             message = 'An error occured.';
+            this.toastService.show('error', message);
             break;
         }
         return message;
@@ -561,7 +572,11 @@ export class TranscriptAnnotationComponent implements OnInit {
       this.actionContext.processMessage(message, this.currentLanguage);
       // this.actionContext.runAction(message, this.currentLanguage);
       this.inserted = message;
-      this.totalTranscript = `${this.totalTranscript} ${message}.`;
+      if (this.totalTranscript === '') {
+        this.totalTranscript = `${message}`;
+      } else {
+        this.totalTranscript = `${this.totalTranscript} ${message}.`;
+      }
     }
   }
 
