@@ -20,7 +20,7 @@ export class TranscriptFormatPipe implements PipeTransform {
     for (const span of spans) {
       const positive = span.positive ? 'positive' : '';
       if (span.start === true) {
-        transcript = this.insertIntoText(transcript, `<span class="${span.type} ${span.side} ${positive} tooltip">`, span.index);
+        transcript = this.insertIntoText(transcript, `<span class="${span.type} ${span.side} ${positive}">`, span.index);
       } else {
         transcript = this.insertIntoText(transcript, `</span>`, span.index);
       }
