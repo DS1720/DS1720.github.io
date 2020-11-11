@@ -403,8 +403,10 @@ export class TranscriptAnnotationComponent implements OnInit {
    * @param endIndex of last letter deleted
    */
   private deleteFromTranscript(startIndex: number, endIndex: number): void {
-    this.totalTranscript = this.totalTranscript.substr(0, startIndex) +
+    if(startIndex >= 0 && endIndex >= 0 && startIndex <= endIndex) {
+      this.totalTranscript = this.totalTranscript.substr(0, startIndex) +
         this.totalTranscript.substr(endIndex);
+    }
   }
 
   /**
