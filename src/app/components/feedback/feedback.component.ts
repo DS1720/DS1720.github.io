@@ -7,6 +7,7 @@ import {Annotation} from '../../shared/Entities/annotation';
 import {Subscription} from 'rxjs';
 import {BdcWalkService} from 'bdc-walkthrough';
 import {NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
+import {ToastService} from '../../shared/services/toast.service';
 
 @Component({
   selector: 'wsa-feedback',
@@ -53,7 +54,8 @@ export class FeedbackComponent implements OnInit {
     private router: Router,
     private dataService: DataService,
     private bdcWalkService: BdcWalkService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private toastService: ToastService
   ) { }
 
   ngOnInit(): void {
@@ -168,6 +170,7 @@ export class FeedbackComponent implements OnInit {
    */
   routeToExam(editMode: boolean): void {
     if (this.tutorial) {
+      this.toastService.show('warning', 'This button is disabled in Tutorial!');
       return;
     }
     if (editMode) {
@@ -211,6 +214,8 @@ export class FeedbackComponent implements OnInit {
   save(): void {
     if (!this.tutorial) {
       this.dataService.saveFeedback(this.feedbackSheet);
+    } else {
+      this.toastService.show('warning', 'This button is disabled in Tutorial!');
     }
   }
 
@@ -221,6 +226,8 @@ export class FeedbackComponent implements OnInit {
     if (!this.tutorial) {
       this.save();
       this.routeToExam(false);
+    } else {
+      this.toastService.show('warning', 'This button is disabled in Tutorial!');
     }
   }
 

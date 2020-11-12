@@ -54,8 +54,8 @@
           +</button>
       </div>
       <div class="split-buttons">
-        <button [bdcWalkTriggerFor]="deleteAnnotation" [enabled]="tutorial" class="delete" [class.active]="'delete'==activeAnnotationType" (click)="changeAnnotationType('delete')">Delete Annotation</button>
-        <button [bdcWalkTriggerFor]="editWalkthrough" [enabled]="tutorial" class="edit" [class.active]="'edit'==activeAnnotationType" (click)="changeAnnotationType('edit')">Edit Text</button>
+        <button [bdcWalkTriggerFor]="deleteAnnotation" [enabled]="tutorial" class="delete" [class.active]="'delete'==activeAnnotationType" (click)="changeAnnotationType('delete')">Delete</button>
+        <button [bdcWalkTriggerFor]="editWalkthrough" [enabled]="tutorial" class="edit" [class.active]="'edit'==activeAnnotationType" (click)="changeAnnotationType('edit')">Edit</button>
       </div>
       <div class="split-buttons save-buttons">
         <button class="save" (click)="saveFeedbackAndTranscript()">Save</button>

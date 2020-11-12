@@ -126,3 +126,32 @@
 #silo-selector {
   margin-right: .3em;
 }
+
+@media only screen and (max-width: 850px) {
+  .annotation-container {
+    display: inline-block;
+    width: 100%;
+  }
+  .annotation-text-container {
+    width: 100% !important;
+  }
+  .annotation-text-container.linksActive, .annotation-text-container.commentActive {
+    margin-bottom: .5rem;
+  }
+  .comment-container {
+    width: 100% !important;
+    margin-right: 0;
+  }
+  .comment-container.linksActive {
+    margin-bottom: .5rem;
+  }
+  .links {
+    width: 100% !important;
+    margin-right: .5rem;
+  }
+  .right-container {
+    display: inline-block;
+    width: 100% !important;
+    padding-right: 0.5rem;
+  }
+}

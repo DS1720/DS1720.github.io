@@ -7,17 +7,15 @@
       <span *ngIf="edit"><fa-icon [icon]="faUserGraduate"></fa-icon> go to student view</span>
       <span *ngIf="!edit"><fa-icon [icon]="faEdit"></fa-icon> go to edit mode</span>
     </button>
-    <button ngbTooltip="Disabled in Tutorial"
-            [disableTooltip]="!tutorial"
-            placement="left"
-            (click)="save()">
+    <button placement="left"
+            (click)="save()"
+            class="hide-phone">
       <fa-icon [icon]="faSave"></fa-icon>
       Save
     </button>
-    <button ngbTooltip="Disabled in Tutorial"
-            [disableTooltip]="!tutorial"
-            placement="right"
-            [bdcWalkTriggerFor]="saveAnnotation" [enabled]="tutorial" (click)="saveAndExit()">
+    <button placement="right"
+            (click)="saveAndExit()"
+            class="hide-phone">
       <fa-icon [icon]="faSignOutAlt"></fa-icon>
       Save & Exit
     </button>
@@ -36,8 +34,7 @@
   <section id="transcript" class="spaces">
     <label for="transcript">
       <h2>
-        <fa-icon ngbTooltip="Disabled in Tutorial"
-                 [disableTooltip]="!tutorial" class="hover-button" (click)="editTranscript()" [icon]="faEdit" *ngIf="edit"></fa-icon>
+        <fa-icon class="hover-button" (click)="editTranscript()" [icon]="faEdit" *ngIf="edit"></fa-icon>
         Recorded Transcript:
       </h2>
       <div class="legend">Annotation-Types:
@@ -63,7 +60,6 @@
       </button>
     </div>
   </section>
-
   <section id="annotations">
     <label for="annotations" [bdcWalkTriggerFor]="annotations" [enabled]="tutorial"><h2>Annotations:</h2></label>
     <span class="annotation-items-container" *ngIf="countAnnotationItems('pronunciation') > 0">
@@ -100,7 +96,7 @@
     </span>
   </section>
   <section id="notes-container" *ngIf="feedbackSheet.getFeedbackNotes() != '' || edit">
-    <label for="annotations"><h2>Notes from Examiner:</h2></label>
+    <label for="notes-container"><h2>Notes from Examiner:</h2></label>
     <span *ngIf="!edit">{{feedbackSheet.getFeedbackNotes()}}</span>
     <textarea [bdcWalkTriggerFor]="notes" [enabled]="tutorial" placeholder="insert notes..." *ngIf="edit" [ngModel]="feedbackSheet.getFeedbackNotes()"
               (ngModelChange)="feedbackSheet.setFeedbackNotes($event)"></textarea>
@@ -118,16 +114,7 @@
     </label>
   </section>
   <div class="button-row">
-    <button
-      ngbTooltip="Disabled in Tutorial"
-      [disableTooltip]="!tutorial"
-      *ngIf="!edit" (click)="routeToExam(false)">
-      <fa-icon [icon]="faHome"></fa-icon>
-      Return to Home
-    </button>
-    <button ngbTooltip="Disabled in Tutorial"
-            [disableTooltip]="!tutorial"
-            *ngIf="edit" (click)="saveAndExit()">
+    <button [bdcWalkTriggerFor]="saveAnnotation" [enabled]="tutorial" (click)="saveAndExit()">
       <fa-icon [icon]="faSignOutAlt"></fa-icon>
       Save & Exit
     </button>
@@ -166,7 +153,7 @@
 </bdc-walk-popup>
 
 <bdc-walk-popup #saveAnnotation name="saveAnnotation" header="Edit, Save & Exit" sideNoteText="15/15" xPosition="before" yPosition="above" [showButton]="true" [closeOnClick]="true" [mustCompleted]="{studentView: true}" [onButtonCompleteTask]="{saveAnnotation: true}">
-  After looking through the feedback you can go <b>back to edit mode</b> by clicking on the button on the left.
+  After looking through the feedback you can go <b>back to edit mode</b> by clicking on the button.
   To <b>exit</b> the grading you click on the <b>save & exit</b> button.
 </bdc-walk-popup>
 

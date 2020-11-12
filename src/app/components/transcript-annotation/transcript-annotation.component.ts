@@ -91,6 +91,9 @@ export class TranscriptAnnotationComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    if(this.inPortraitMode()) {
+      this.toastService.show('warning', 'This app is optimized for landscape mode. Please turn your Phone!');
+    }
     this.edit = this.route.snapshot.queryParamMap.get('edit') ? this.route.snapshot.queryParamMap.get('edit') === 'true' : false;
     this.tutorial = this.route.snapshot.queryParamMap.get('tutorial')
       ? this.route.snapshot.queryParamMap.get('tutorial') === 'true' : false;
@@ -533,5 +536,12 @@ export class TranscriptAnnotationComponent implements OnInit {
 
   get isListening(): boolean {
     return this.speechRecognizer.isListening;
+  }
+
+  /**
+   * returns true if display is in landscape mode
+   */
+  inPortraitMode(): boolean {
+    return window.innerHeight > window.innerWidth;
   }
 }

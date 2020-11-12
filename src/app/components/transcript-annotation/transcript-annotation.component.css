@@ -8,21 +8,6 @@
 -------------
  */
 
-/*
-  Error Message
- */
-.error-message {
-  display: none;
-  position: absolute;
-  top: 0;
-  left: 50%;
-  margin-top: 5px;
-  transform: translateX(-50%);
-  border: 5px solid var(--error-background);
-  padding: 1em;
-  background: white;
-}
-
 
 /*
   Grid/Flexbox Styles
@@ -36,6 +21,13 @@
   background: whitesmoke;
 }
 
+@media only screen and (orientation: portrait) {
+  #grid {
+    grid-template-columns: 100%;
+    grid-template-rows: 70% 30%;
+  }
+}
+
 /*
   Left Side
  */
@@ -45,6 +37,12 @@
   min-height: 0;
   grid-template-rows: 7em minmax(0, 1fr) 12em;
   padding: 0rem 0rem 1rem 1rem;
+}
+
+@media only screen and (max-width: 850px) {
+  .properties-container {
+    grid-template-rows: 7em minmax(0, 1fr);
+  }
 }
 
 .properties-container section {
@@ -163,6 +161,12 @@ textarea.notes-text-container {
   height: 100%;
 }
 
+@media only screen and (max-width: 850px) {
+  .notes {
+    display: none;
+  }
+}
+
 /*
   Right Side
  */
@@ -244,7 +248,7 @@ textarea.notes-text-container {
   color: white;
 }
 
-.student-annotations-container button:last-child:hover {
+.student-annotations-container .annotation-item button:last-child:hover {
   color: black;
 }
 
@@ -253,7 +257,7 @@ textarea.notes-text-container {
   color: white;
 }
 
-.student-annotations-container button:last-child.active {
+.student-annotations-container .annotation-item button:last-child.active {
   color: black;
 }
 
@@ -314,6 +318,44 @@ button.save:active {
 
 .split-buttons button:last-child {
   margin-left: .5rem;
+}
+
+@media only screen and (max-width: 850px) {
+  .student-annotations-container {
+    font-size: .7em;
+  }
+
+  .student-annotations-container .annotation-item button:first-child {
+    background-position: calc(-60% + 20px) 100%;
+  }
+
+  .student-annotations-container .annotation-item button {
+    padding-left: 0px;
+  }
+
+  .annotation-item {
+    margin-bottom: 0.5rem;
+  }
+  .split-buttons button:first-child {
+    margin-right: 0;
+  }
+
+  .student-annotations-container .split-buttons {
+    margin-bottom: 0.5rem;
+  }
+
+  .student-annotations-container {
+    padding-left: .5rem;
+    padding-top: .5rem;
+    padding-right: .5rem;
+  }
+}
+
+@media only screen and (orientation: portrait) {
+  #grid {
+    grid-template-columns: 100%;
+    grid-template-rows: 60% 40%;
+  }
 }
 
 /*
