@@ -107,6 +107,7 @@
 .transcript-container {
   display: flex;
   flex-direction: column;
+  font-family: var(--font-transcript);
 }
 
 .transcript-container label {
@@ -243,9 +244,17 @@ textarea.notes-text-container {
   color: white;
 }
 
+.student-annotations-container button:last-child:hover {
+  color: black;
+}
+
 .student-annotations-container button.active, .student-annotations-container .annotation-item button:first-child.active {
   background-position: -100%;
   color: white;
+}
+
+.student-annotations-container button:last-child.active {
+  color: black;
 }
 
 button.pronunciation {

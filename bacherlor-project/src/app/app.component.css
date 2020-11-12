@@ -11,9 +11,8 @@
   --grammar-color: #C8963E;
   --wordchoice-color: #032340;
   --tense-color: #7C9EB2;
-  --positive-color: #1f672e;
-  --positive-color-background: rgba(31, 103, 46, 0.5);
-  --negative-color: #d74040;
+  --positive-color: #86BA90;
+  --negative-color: #c15050;
   --error-background: #bc3a3a;
   --delete-color: black;
   --edit-color: black;
@@ -26,6 +25,7 @@
   --record-end: #E5625E;
   --hover-color-black: rgb(96,96,96);
   --forbidden-background-color: rgba(222, 5, 5, 0.8);
+  --font-transcript: 400 14px/20px Roboto, "Helvetica Neue", sans-serif;
 }
 
 /*
@@ -89,7 +89,7 @@
 }
 
 :host /deep/ span.positive {
-  background-color: var(--positive-color-background);
+  background-color: var(--positive-color);
   color: black;
   /*border-top: 2px solid var(--positive-color);
   border-bottom: 2px solid var(--positive-color);*/

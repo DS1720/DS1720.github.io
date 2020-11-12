@@ -71,6 +71,7 @@ section {
   max-height: 200px;
   overflow: hidden;
   transition: max-height 0.5s ease-in-out;
+  font-family: var(--font-transcript);
 }
 
 .transcript.show-transcript {

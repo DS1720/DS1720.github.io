@@ -6,15 +6,19 @@
        [class.commentActive]="annotationItem.comment !== '' || edit"
        [class.linksActive]="annotationItem.links.length > 0 || edit">
     <span class="annotation-text">
-    ... <span class="spaces " [innerHTML]="annotationItem.annotationText | transcriptFormat"></span> ...
+    ... <span class="spaces transcript" [innerHTML]="annotationItem.annotationText | transcriptFormat"></span> ...
     </span>
   </div>
   <div class="right-container" [class.edit]="edit"
+       [class.commentActive]="annotationItem.comment !== '' || edit"
+       [class.linksActive]="annotationItem.links.length > 0 || edit"
        *ngIf="annotationItem.comment !== '' || annotationItem.links.length > 0 || edit">
     <div class="comment-container"
          *ngIf="annotationItem.comment !== '' || edit"
          [class.linksActive]="annotationItem.links.length > 0 || edit">
-      <span *ngIf="!edit" class="comment"><i>{{annotationItem.comment}}</i></span>
+      <span *ngIf="!edit" class="comment">
+        {{annotationItem.comment}}
+      </span>
       <textarea placeholder="insert comment..." *ngIf="edit" id="comment-editor"
                 [(ngModel)]="annotationItem.comment"></textarea>
     </div>
@@ -29,7 +33,7 @@
         <fa-icon *ngIf="!edit" [icon]="faArrowCircleRight"></fa-icon>
         <fa-icon *ngIf="edit" (click)="deleteLink(link)" class="trash hover-button" [icon]="faTrash"></fa-icon>
         {{link}}</li>
-      <input *ngIf="edit" list="silos" [id]="'silo-selector' + annotationItem.annotation.getId()" name="silo-selector" [(ngModel)]="selectedLink">
+      <input (keydown.enter)="addLink()" *ngIf="edit" list="silos" [id]="'silo-selector' + annotationItem.annotation.getId()" name="silo-selector" [(ngModel)]="selectedLink">
       <fa-icon *ngIf="edit" (click)="addLink()" class="hover-button" [icon]="faPlus"></fa-icon>
       <datalist id="silos">
         <option value="a vs. an"></option>
