@@ -8,8 +8,8 @@ export class ToastService {
   // tslint:disable-next-line:no-any
   toasts: any[] = [];
 
-  show(header: string, body: string): void {
-    this.toasts.push({ header, body });
+  show(type: string, body: string, delay?: number): void {
+    this.toasts.push({ type, body, delay });
   }
 
   // tslint:disable-next-line:no-any

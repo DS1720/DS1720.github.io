@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import {merge, Observable, of, Subject, Subscription} from 'rxjs';
 import {count, map, tap} from 'rxjs/operators';
 import { defaultLanguage, languages } from '../../shared/model/languages';
-import { SpeechError } from '../../shared/model/speech-error';
 import { SpeechEvent } from '../../shared/model/speech-event';
 import { SpeechRecognizerService } from '../../shared/services/web-apis/speech-recognizer.service';
 import { ActionContext } from '../../shared/services/actions/action-context';
@@ -52,10 +51,6 @@ export class TranscriptAnnotationComponent implements OnInit {
   currentLanguage: string = defaultLanguage;
   totalTranscript = '';
   transcript$?: Observable<string>;
-  listening$?: Observable<boolean>;
-  isListening = false;
-  errorMessage$?: Observable<string>;
-  defaultError$ = new Subject<string | undefined>();
   annotationTypes: string[] = [];
   activeAnnotationType = '';
   activeAnnotationPositive = false;
@@ -69,7 +64,6 @@ export class TranscriptAnnotationComponent implements OnInit {
   feedback = '';
   editTextIndexes: number[] = [-1, -1];
   inserted = '';
-  showErrorMsg = false;
   tutorial = false;
 
   // Walkthrough
@@ -105,7 +99,6 @@ export class TranscriptAnnotationComponent implements OnInit {
     if (webSpeechReady) {
       this.initRecognition();
     } else {
-      this.errorMessage$ = of('Your Browser is not supported. Please try Google Chrome.');
       this.toastService.show('error', 'Your Browser is not supported. Please try Google Chrome.');
     }
     for (const error of Object.keys(StudentAnnotationType)) {
@@ -461,6 +454,7 @@ export class TranscriptAnnotationComponent implements OnInit {
     const element = document.getElementById('temporaryText');
     if (element) {
       let recordedText = element.innerHTML;
+
       // after first time inserted space has to be removed
       if (recordedText[0] === ' ') {
         recordedText = recordedText.substr(1, recordedText.length - 1);
@@ -492,13 +486,11 @@ export class TranscriptAnnotationComponent implements OnInit {
    * ends recording if already recording
    */
   private start(): void {
-    if (this.speechRecognizer.isListening) {
+    if (this.isListening) {
       this.stop();
       return;
     }
-    this.defaultError$.next(undefined);
     this.speechRecognizer.start();
-    this.isListening = true;
   }
 
   /**
@@ -506,7 +498,6 @@ export class TranscriptAnnotationComponent implements OnInit {
    */
   private stop(): void {
     this.speechRecognizer.stop();
-    this.isListening = false;
   }
 
   /**
@@ -518,46 +509,6 @@ export class TranscriptAnnotationComponent implements OnInit {
         this.processNotification(notification);
       }),
       map((notification) => notification.content || '')
-    );
-
-    this.listening$ = merge(
-      this.speechRecognizer.onStart(),
-      this.speechRecognizer.onEnd()
-    ).pipe(map((notification) => notification.event === SpeechEvent.Start));
-
-    this.errorMessage$ = merge(
-      this.speechRecognizer.onError(),
-      this.defaultError$
-    ).pipe(
-      map((data) => {
-        if (data === undefined) {
-          return '';
-        }
-        if (typeof data === 'string') {
-          return data;
-        }
-        let message;
-        switch (data.error) {
-          case SpeechError.NotAllowed:
-            message = `Your browser is not authorized to access your microphone.
-            Verify that your browser has access to your microphone and try again.`;
-            this.toastService.show('error', message);
-            break;
-          case SpeechError.NoSpeech:
-            message = `No speech has been detected. Please try again.`;
-            this.toastService.show('error', message);
-            break;
-          case SpeechError.AudioCapture:
-            message = `Microphone is not available. Please verify the connection of your microphone and try again.`;
-            this.toastService.show('error', message);
-            break;
-          default:
-            message = 'An error occured.';
-            this.toastService.show('error', message);
-            break;
-        }
-        return message;
-      })
     );
   }
 
@@ -580,11 +531,7 @@ export class TranscriptAnnotationComponent implements OnInit {
     }
   }
 
-  listening(): boolean {
+  get isListening(): boolean {
     return this.speechRecognizer.isListening;
-  }
-
-  endErrorMsg(): void {
-
   }
 }

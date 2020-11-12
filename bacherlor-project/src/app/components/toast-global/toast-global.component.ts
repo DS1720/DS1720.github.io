@@ -13,4 +13,17 @@ export class ToastGlobalComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  // tslint:disable-next-line:no-any
+  getClass(toast: any): string {
+    if (toast.type && toast.type === 'error') {
+      return 'bg-danger text-light';
+    } else if (toast.type && toast.type === 'warning') {
+      return 'bg-warning text-dark';
+    }
+    else if (toast.type && toast.type === 'info') {
+      return 'bg-info text-light';
+    }
+    return '';
+  }
+
 }

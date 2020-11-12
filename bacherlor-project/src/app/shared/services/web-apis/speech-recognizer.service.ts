@@ -1,10 +1,11 @@
-import { Injectable, NgZone } from '@angular/core';
-import { Observable } from 'rxjs';
+import {EventEmitter, Injectable, NgZone, Output} from '@angular/core';
+import {BehaviorSubject, Observable, Subject} from 'rxjs';
 
 import { SpeechNotification } from '../../model/speech-notification';
 import { SpeechError } from '../../model/speech-error';
 import { SpeechEvent } from '../../model/speech-event';
 import { AppWindow } from '../../model/app-window';
+import {ToastService} from '../toast.service';
 // tslint:disable-next-line:no-any
 const { webkitSpeechRecognition }: AppWindow = (window as any) as AppWindow;
 
@@ -16,63 +17,81 @@ export class SpeechRecognizerService {
   language!: string;
   isListening = false;
 
-  constructor(private ngZone: NgZone) {}
+  constructor(private ngZone: NgZone, private toastService: ToastService) {
+  }
 
+  /**
+   * initialize speech recognition with language
+   * @param language of speech recognition
+   */
   initialize(language: string): boolean {
+    this.isListening = false;
     if ('webkitSpeechRecognition' in window) {
       this.recognition = new webkitSpeechRecognition();
       this.recognition.continuous = true;
       this.recognition.interimResults = true;
       this.setLanguage(language);
+      this.recognition.addEventListener('end', () => {
+        this.isListening = false;
+        this.toastService.show('warning', 'Recording Stopped', 10000);
+      });
+      this.recognition.addEventListener('start', () => {
+        this.toastService.show('warning', 'Recording Started');
+      });
+
+      this.recognition.onerror = (event) => {
+        // tslint:disable-next-line:no-any
+        const eventError: string = (event as any).error;
+        console.log('error', eventError);
+        switch (eventError) {
+          case 'no-speech':
+            this.toastService.show('error', `No speech has been detected. Please try again.`);
+            break;
+          case 'audio-capture':
+            this.toastService.show('error', `Microphone is not available. Please verify the connection of your microphone and try again.`);
+            break;
+          case 'not-allowed':
+            this.toastService.show('error', `Your browser is not authorized to access your microphone.
+            Verify that your browser has access to your microphone and try again.`);
+            break;
+          case 'network':
+            this.toastService.show('error', `A network communication is needed for the recognition.`);
+            break;
+          default:
+            this.toastService.show('error', `An unknown error occured.`);
+            break;
+        }
+      };
       return true;
     }
 
     return false;
   }
 
+
+  /**
+   * sets language of speech recognition
+   * @param language of speech recognition
+   */
   setLanguage(language: string): void {
     this.language = language;
     this.recognition.lang = language;
   }
 
+  /**
+   * starts recognition
+   */
   start(): void {
     if (!this.recognition) {
       return;
     }
-
     this.recognition.start();
     this.isListening = true;
   }
 
-  onStart(): Observable<SpeechNotification<never>> {
-    if (!this.recognition) {
-      this.initialize(this.language);
-    }
-
-    return new Observable(observer => {
-      this.recognition.onstart = () => {
-        this.ngZone.run(() => {
-          observer.next({
-            event: SpeechEvent.Start
-          });
-        });
-      };
-    });
-  }
-
-  onEnd(): Observable<SpeechNotification<never>> {
-    return new Observable(observer => {
-      this.recognition.onend = () => {
-        this.ngZone.run(() => {
-          observer.next({
-            event: SpeechEvent.End
-          });
-          this.isListening = false;
-        });
-      };
-    });
-  }
-
+  /**
+   * returns observable that deals with the result
+   */
   onResult(): Observable<SpeechNotification<string>> {
     return new Observable(observer => {
       this.recognition.onresult = (event: SpeechRecognitionEvent) => {
@@ -103,37 +122,9 @@ export class SpeechRecognizerService {
     });
   }
 
-  onError(): Observable<SpeechNotification<never>> {
-    return new Observable(observer => {
-      this.recognition.onerror = (event) => {
-        // tslint:disable-next-line:no-any
-        const eventError: string = (event as any).error;
-        console.log('error', eventError);
-        let error: SpeechError;
-        switch (eventError) {
-          case 'no-speech':
-            error = SpeechError.NoSpeech;
-            break;
-          case 'audio-capture':
-            error = SpeechError.AudioCapture;
-            break;
-          case 'not-allowed':
-            error = SpeechError.NotAllowed;
-            break;
-          default:
-            error = SpeechError.Unknown;
-            break;
-        }
-
-        this.ngZone.run(() => {
-          observer.next({
-            error
-          });
-        });
-      };
-    });
-  }
-
+  /**
+   * stops recognition
+   */
   stop(): void {
     this.recognition.stop();
     this.isListening = false;

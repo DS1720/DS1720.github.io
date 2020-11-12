@@ -17,13 +17,13 @@
         {{exam.name}} | {{activeStudent.course}}
       </div>
       <div class="record-button" *ngIf="!edit">
-        <button [bdcWalkTriggerFor]="recordButton" [enabled]="tutorial" (click)="toggleListening()" [class.active]="listening()">
-          <fa-icon *ngIf="listening()" [icon]="faMicrophone"></fa-icon>
-          <fa-icon *ngIf="!listening()" [icon]="faMicrophoneSlash"></fa-icon>
+        <button [bdcWalkTriggerFor]="recordButton" [enabled]="tutorial" (click)="toggleListening()" [class.active]="isListening">
+          <fa-icon *ngIf="isListening" [icon]="faMicrophone"></fa-icon>
+          <fa-icon *ngIf="!isListening" [icon]="faMicrophoneSlash"></fa-icon>
         </button>
         <div>
-          <span *ngIf="!listening()">Start Recording</span>
-          <span *ngIf="listening()">Stop Recording</span>
+          <span *ngIf="!isListening">Start Recording</span>
+          <span *ngIf="isListening">Stop Recording</span>
         </div>
       </div>
     </section>
@@ -66,10 +66,6 @@
       </div>
   </section>
 </div>
-
-<section *ngIf="errorMessage$| async as errorMessage" class="error-message">
-  <div class="notification">{{errorMessage}}</div>
-</section>
 
 <bdc-walk-popup #welcome name="welcome" header="Welcome" [arrow]="false" sideNoteText="1/15" xPosition="after" [showButton]="true" buttonText="Let's start" [closeOnClick]="true" [onButtonCompleteTask]="{welcome: true}">
   To make your life easier we would like to show you a short tutorial.
