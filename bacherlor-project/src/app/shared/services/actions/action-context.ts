@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActionStrategy } from './action-strategy';
-import { ChangeThemeStrategy } from './change-theme-strategy';
 import { ChangeTitleStrategy } from './change-title-strategy';
-import { SpeechSynthesizerService } from '../web-apis/speech-synthesizer.service';
 
 @Injectable({
   providedIn: 'root',
@@ -12,10 +10,8 @@ export class ActionContext {
   private currentStrategy?: ActionStrategy;
 
   constructor(
-    private changeThemeStrategy: ChangeThemeStrategy,
     private changeTitleStrategy: ChangeTitleStrategy,
     private titleService: Title,
-    private speechSynthesizer: SpeechSynthesizerService
   ) {
     this.changeTitleStrategy.titleService = titleService;
   }
@@ -46,19 +42,12 @@ export class ActionContext {
 
   private hasChangedStrategy(message: string, language: string): boolean {
     let strategy: ActionStrategy | undefined;
-    if (message === this.changeThemeStrategy.getStartSignal(language)) {
-      strategy = this.changeThemeStrategy;
-    }
     if (message === this.changeTitleStrategy.getStartSignal(language)) {
       strategy = this.changeTitleStrategy;
     }
 
     if (strategy) {
       this.setStrategy(strategy);
-      this.speechSynthesizer.speak(
-        strategy.getInitialResponse(language),
-        language
-      );
       return true;
     }
 
@@ -67,14 +56,9 @@ export class ActionContext {
 
   private isFinishSignal(message: string, language: string): boolean {
     if (
-      message === this.changeThemeStrategy.getEndSignal(language) ||
       message === this.changeTitleStrategy.getEndSignal(language)
     ) {
       if (this.currentStrategy) {
-        this.speechSynthesizer.speak(
-          this.currentStrategy.getFinishResponse(language),
-          language
-        );
       }
       this.setStrategy(undefined);
       return true;
