@@ -214,6 +214,7 @@ export class FeedbackComponent implements OnInit {
   save(): void {
     if (!this.tutorial) {
       this.dataService.saveFeedback(this.feedbackSheet);
+      this.toastService.show('success', 'Successfully saved Feedback!');
     } else {
       this.toastService.show('warning', 'This button is disabled in Tutorial!');
     }

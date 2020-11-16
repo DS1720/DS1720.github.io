@@ -22,6 +22,8 @@ export class ToastGlobalComponent implements OnInit {
     }
     else if (toast.type && toast.type === 'info') {
       return 'bg-info text-light';
+    } else if (toast.type && toast.type === 'success') {
+      return 'bg-success text-light';
     }
     return '';
   }

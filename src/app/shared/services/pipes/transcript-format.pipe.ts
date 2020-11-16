@@ -1,6 +1,7 @@
 import {Pipe, PipeTransform} from '@angular/core';
 import {Annotation} from '../../Entities/annotation';
 import {split} from 'ts-node';
+import {StudentAnnotationType} from '../../Entities/annotation-type';
 
 @Pipe({
   name: 'transcriptFormat'
@@ -19,13 +20,37 @@ export class TranscriptFormatPipe implements PipeTransform {
     // insert start and end spans separately with span type and side as class
     for (const span of spans) {
       const positive = span.positive ? 'positive' : '';
+      const type = this.isValidAnnotationType(span.type) ? span.type : '';
+      const side = this.isValidSideType(span.side) ? span.side : '';
       if (span.start === true) {
-        transcript = this.insertIntoText(transcript, `<span class="${span.type} ${span.side} ${positive}">`, span.index);
+        transcript = this.insertIntoText(transcript, `<span class="${type} ${side} ${positive}">`, span.index);
       } else {
         transcript = this.insertIntoText(transcript, `</span>`, span.index);
       }
     }
     return transcript;
+  }
+
+  isValidAnnotationType(annotationType: string | undefined): boolean {
+    if (annotationType === undefined) {
+      return false;
+    }
+    for (const annotation of Object.keys(StudentAnnotationType)) {
+      if (annotation.split(' ').join('') === annotationType) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  isValidSideType(sides: string | undefined): boolean {
+    if (sides === undefined) {
+      return false;
+    }
+    if (sides === 'left right' || sides === 'left' || sides === 'right') {
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -43,7 +68,8 @@ export class TranscriptFormatPipe implements PipeTransform {
    * returns spans in order from back to front
    * @param annotations made in the text
    */
-  private getSpans(annotations: Annotation[]): { index: number, type?: string, id: number, start: boolean, side: string, positive: boolean }[] {
+  private getSpans(annotations: Annotation[]): { index: number,
+    type?: string, id: number, start: boolean, side: string, positive: boolean }[] {
     const spans: {index: number, type?: string, id: number, start: boolean, side: string, positive: boolean}[] = [];
     // insert a span for every word in annotation
     for (const studentAnnotation of annotations) {

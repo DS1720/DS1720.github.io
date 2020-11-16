@@ -92,8 +92,9 @@ export class TranscriptAnnotationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.inPortraitMode()) {
-      this.toastService.show('warning', 'This app is optimized for landscape mode. Please turn your Phone!');
+    if ( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+      this.toastService.show('warning', 'This Feature is currently not fully tested for mobile devices! Your device might not be' +
+        ' compatible with Speech Recognition. If errors occur switch to a Desktop device.', 10000);
     }
     this.edit = this.route.snapshot.queryParamMap.get('edit') ? this.route.snapshot.queryParamMap.get('edit') === 'true' : false;
     this.tutorial = this.route.snapshot.queryParamMap.get('tutorial')
@@ -176,6 +177,7 @@ export class TranscriptAnnotationComponent implements OnInit {
     this.feedbackSheet.setFeedbackNotes(this.feedback);
     this.feedbackSheet.setTranscript(this.totalTranscript);
     this.dataService.saveFeedback(this.feedbackSheet);
+    this.toastService.show('success', 'Successfully saved Transcript and Notes');
   }
 
   /**
