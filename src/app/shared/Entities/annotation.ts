@@ -55,6 +55,9 @@ export class Annotation {
         tempAnnotation.setEndIndex(beginIndex + length + 1);
         tempAnnotation.setText(text.substr(tempAnnotation.getStartIndex(), tempAnnotation.getEndIndex() - tempAnnotation.getStartIndex()));
         tempAnnotation.setOffsetBack(tempAnnotation.getText().length - tempAnnotation.getText().lastIndexOf('<'));
+      } else {
+        // get offset Back
+        annotations.push(new Annotation(tempId, '', -1, beginIndex + length + 1, '', -1, length, false));
       }
     }
     return annotations;
@@ -66,8 +69,11 @@ export class Annotation {
    */
   private static getIdFromString(text: string): number {
     const startIndexId = text.search('id="') + 4;
-    const idLength = text.substr(startIndexId).search('"');
-    return +text.substr(startIndexId, idLength);
+    if (startIndexId !== -1) {
+      const idLength = text.substr(startIndexId).search('"');
+      return +text.substr(startIndexId, idLength);
+    }
+    return -1;
   }
 
   /**
@@ -79,16 +85,52 @@ export class Annotation {
   private static getAnnotationFromString(text: string, startIndex: number): Annotation {
     const id = this.getIdFromString(text);
     const startIndexType = text.search('type="') + 6;
-    const typeLength = text.substr(startIndexType).search('"');
-    const type = text.substr(startIndexType, typeLength);
+    let type = '';
+    if (startIndexType !== -1) {
+      const typeLength = text.substr(startIndexType).search('"');
+      type = text.substr(startIndexType, typeLength);
+    }
     const positiveIndex = text.search('positive="') + 10;
-    const positiveLength = text.substr(positiveIndex).search('"');
-    const positiveString = text.substr(positiveIndex, positiveLength);
+    let positiveString = '';
+    if (positiveIndex !== -1) {
+      const positiveLength = text.substr(positiveIndex).search('"');
+      positiveString = text.substr(positiveIndex, positiveLength);
+    }
     let positive = true;
     if (positiveString === 'false') {
       positive = false;
     }
     return new Annotation(id, type, startIndex, -1, '', text.length, -1, positive);
+  }
+
+  /**
+   * get all Tags from String
+   */
+  static getAllTagsFromString(text: string): {id: number, start: boolean, type: string, positive: boolean}[] {
+    const tags: {id: number, start: boolean, type: string, positive: boolean}[] = [];
+    let tempStartIndex = text.search(this.regexStartTag);
+    // get start tags
+    let tempText = text;
+    while (tempStartIndex !== -1) {
+      tempText = tempText.substr(tempStartIndex);
+      const length = tempText.search('>');
+      const annotation = this.getAnnotationFromString(tempText.substr(0, length), 0);
+      tempText = tempText.substr(length + 1);
+      tags.push({id: annotation.id, start: true, type: annotation.type, positive: annotation.positive});
+      tempStartIndex = tempText.search(this.regexStartTag);
+    }
+    // get end tags
+    tempText = text;
+    tempStartIndex = tempText.search(this.regexEndTag);
+    while (tempStartIndex !== -1) {
+      tempText = tempText.substr(tempStartIndex);
+      const length = tempText.search('>');
+      const annotation = this.getAnnotationFromString(tempText.substr(0, length + 1), 0);
+      tempText = tempText.substr(length + 1);
+      tags.push({id: annotation.id, start: false, type: '', positive: false});
+      tempStartIndex = tempText.search(this.regexEndTag);
+    }
+    return tags;
   }
 
   /**

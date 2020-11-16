@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import {merge, Observable, of, Subject, Subscription} from 'rxjs';
-import {count, map, tap} from 'rxjs/operators';
+import {count, first, last, map, tap} from 'rxjs/operators';
 import { defaultLanguage, languages } from '../../shared/model/languages';
 import { SpeechEvent } from '../../shared/model/speech-event';
 import { SpeechRecognizerService } from '../../shared/services/web-apis/speech-recognizer.service';
@@ -58,6 +58,7 @@ export class TranscriptAnnotationComponent implements OnInit {
   exam = {name: 'Mid Term 2020S', maxPoints: 100, reachedPoints: 0};
   showEditPopup = false;
   textToEdit = '';
+  tagsInEdit: {id: number, start: boolean, type: string, positive: boolean}[] = [];
   feedbackSheet: FeedbackSheet = new FeedbackSheet(
     {id: -1, name: '', course: ''},
     {name: '', maxPoints: -1, reachedPoints: -1}, '', '', []);
@@ -91,7 +92,7 @@ export class TranscriptAnnotationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if(this.inPortraitMode()) {
+    if (this.inPortraitMode()) {
       this.toastService.show('warning', 'This app is optimized for landscape mode. Please turn your Phone!');
     }
     this.edit = this.route.snapshot.queryParamMap.get('edit') ? this.route.snapshot.queryParamMap.get('edit') === 'true' : false;
@@ -237,18 +238,174 @@ export class TranscriptAnnotationComponent implements OnInit {
     this.toogleEditPopup();
     this.editTextIndexes = [startIndex, endIndex];
     this.textToEdit = this.totalTranscript.substr(startIndex, endIndex - startIndex);
+    this.tagsInEdit = Annotation.getAllTagsFromString(this.textToEdit);
   }
 
   confirmEditText(): void {
+    // check if Tags were edited
+    const tempTags: {id: number, start: boolean, type: string, positive: boolean}[]
+      = Annotation.getAllTagsFromString(this.textToEdit);
+    // sort arrays
+    this.tagsInEdit.sort((a, b) => {
+      return a.id > b. id ? 1 : a.id < b.id ? -1 : a.start ? 1 : b.start ? -1 : 0;
+    });
+    tempTags.sort((a, b) => {
+      return a.id > b. id ? 1 : a.id < b.id ? -1 : a.start ? 1 : b.start ? -1 : 0;
+    });
+    let indexA = 0;
+    let indexB = 0;
+    let idsToDelete: number[] = [];
+    // search for deleted or inserted tags
+    while (indexA < this.tagsInEdit.length && indexB < tempTags.length) {
+      const tagA = this.tagsInEdit[indexA];
+      const tagB = tempTags[indexB];
+      if (tagA.id === tagB.id) {
+        if (tagA.start === tagB.start) {
+          indexA++;
+          indexB++;
+        } else if (tagA) {
+          idsToDelete.push(tagA.id);
+          indexA++;
+        } else {
+          idsToDelete.push(tagB.id);
+          indexB++;
+        }
+      } else if (tagA.id > tagB.id) {
+        idsToDelete.push(tagA.id);
+        indexA++;
+      } else {
+        idsToDelete.push(tagB.id);
+        indexB++;
+      }
+    }
+    if (indexB < tempTags.length) {
+      for (; indexB < tempTags.length; indexB++) {
+        idsToDelete.push(tempTags[indexB].id);
+      }
+    } else {
+      for (; indexA < this.tagsInEdit.length; indexA++) {
+        idsToDelete.push(this.tagsInEdit[indexA].id);
+      }
+    }
     this.changeTranscript(this.editTextIndexes[0], this.editTextIndexes[1], this.textToEdit);
+    if (idsToDelete.length > 0) {
+      // distinct values
+      idsToDelete = idsToDelete.filter((n, i) => idsToDelete.indexOf(n) === i);
+      let annotations = Annotation.getAnnotationsFromString(this.totalTranscript);
+      annotations = annotations.filter(item => idsToDelete.indexOf(item.getId()) !== -1);
+      this.deleteAnnotationsFromTranscript(annotations);
+    }
+    this.totalTranscript = this.getWellformedTranscript(this.totalTranscript);
     this.toogleEditPopup();
     this.textToEdit = '';
     this.editTextIndexes = [-1, -1];
   }
 
+  /**
+   * checks if Transcript is well formed (no open tags, all tags are in right format)
+   */
+  getWellformedTranscript(text: string): string {
+    // ToDo: make wellformed transcript -> check for open Tags and tags not fitting regex
+    let open = false;
+    let tempText = text;
+    let lastOpenIndex = -1;
+    let closeTagIndex = tempText.search('>');
+    let openTagIndex = tempText.search('<');
+    let offset = 0;
+    // check if every openTag is followed by a closingTag
+    while (closeTagIndex !== -1 || openTagIndex !== -1) {
+      // only close Tag in Text
+      if (openTagIndex === -1) {
+        // if last Tag closing and Tag is opened -> close Tag
+        if (open) {
+          open = false;
+          offset += closeTagIndex + 1;
+        } else { // no Tag open but closing Tag -> delete Tag
+          text = text.substr(0, offset + closeTagIndex) + text.substr(offset + closeTagIndex + 1);
+          offset += closeTagIndex;
+        }
+        tempText = tempText.substr(closeTagIndex + 1); // always +1 because not deleted in tempText
+      } else if (closeTagIndex === -1) {
+        // only open Tag in Text -> delete
+        text = text = text.substr(0, offset + openTagIndex) + text.substr(offset + openTagIndex + 1);
+        tempText = tempText.substr(openTagIndex);
+        offset += openTagIndex;
+        tempText = tempText.substr(openTagIndex + 1);
+      } else if (closeTagIndex < openTagIndex) {
+        // closeTag before open Tag
+        if (open) {
+          // tag is open -> close it
+          open = false;
+          offset += closeTagIndex + 1;
+        } else {
+          // no tag open -> delete
+          text = text.substr(0, offset + closeTagIndex) + text.substr(offset + closeTagIndex + 1);
+          offset += closeTagIndex;
+        }
+        tempText = tempText.substr(closeTagIndex + 1);
+      } else if (closeTagIndex >= openTagIndex) {
+        // open tag before close tag
+        if (open) {
+          // tag is already open -> remove last opening Tag
+          text = text.substr(0, lastOpenIndex) + text.substr(lastOpenIndex + 1);
+          offset += openTagIndex;
+        } else {
+          // tag is closed -> open Tag
+          open = true;
+          lastOpenIndex = offset + openTagIndex;
+          offset += openTagIndex + 1;
+        }
+        tempText = tempText.substr(openTagIndex + 1);
+      }
+      closeTagIndex = tempText.search('>');
+      openTagIndex = tempText.search('<');
+    }
+    // check if all Tags are in right format
+    const regexStartTag = /<annotation id="\d*" type="\w*" positive="\w*"\/>/;
+    const regexEndTag = /<annotation id="\d*"\/>/;
+    tempText = text;
+    offset = 0;
+    let tagRegex = this.getLowestIndex(tempText.search(regexStartTag), tempText.search(regexEndTag));
+    openTagIndex = tempText.search('<');
+    while (openTagIndex !== -1) {
+      const closeTag = tempText.search('>');
+      if (tagRegex === -1 || openTagIndex < tagRegex) {
+        text = text.substr(0, offset + closeTag) + text.substr(offset + closeTag + 1);
+        text = text.substr(0, offset + openTagIndex) + text.substr(offset + openTagIndex + 1);
+        offset += closeTag - 1; // -1 because 2 chars are deleted
+      } else {
+        offset += closeTag + 1;
+      }
+      tempText = tempText.substr(closeTag + 1);
+      tagRegex = this.getLowestIndex(tempText.search(regexStartTag), tempText.search(regexEndTag));
+      openTagIndex = tempText.search('<');
+    }
+    console.log(text);
+    return text;
+  }
+
+  /**
+   * returns lowest Index that is not -1
+   * @param indexA
+   * @param indexB
+   */
+  getLowestIndex(indexA: number, indexB: number): number {
+    if (indexA === -1 && indexB === -1) {
+      return -1;
+    } else if (indexA === -1) {
+      return indexB;
+    } else if (indexB === -1) {
+      return indexA;
+    } else if (indexA < indexB) {
+      return indexA;
+    } else {
+      return indexB;
+    }
+  }
+
   private changeTranscript(startIndex: number, endIndex: number, insert: string): void {
     this.deleteFromTranscript(startIndex, endIndex);
-    this.insertIntoTranscript(startIndex, insert);
+    this.totalTranscript = [this.totalTranscript.slice(0, startIndex), insert, this.totalTranscript.slice(startIndex)].join('');
   }
 
   /**
@@ -323,7 +480,7 @@ export class TranscriptAnnotationComponent implements OnInit {
   }
 
   /**
-   * insert text into
+   * insert text into transcript
    * @param index insertion
    * @param text that is inserted
    */
@@ -412,12 +569,13 @@ export class TranscriptAnnotationComponent implements OnInit {
    * @param annotations that should be deleted from Transcript
    */
   private deleteAnnotationsFromTranscript(annotations: Annotation[]): void {
+    console.log(annotations);
     if (annotations.length <= 0) { return; }
     const deleteIndexes: {startIndex: number, endIndex: number}[] = [];
     annotations.forEach(annotation => {
       deleteIndexes.push({
-        startIndex: annotation.getStartIndex() + annotation.getText().length - annotation.getOffsetBack(),
-        endIndex: annotation.getStartIndex() + annotation.getText().length
+        startIndex: annotation.getEndIndex() - annotation.getOffsetBack() - 1,
+        endIndex: annotation.getEndIndex()
       });
       deleteIndexes.push({
         startIndex: annotation.getStartIndex(),
@@ -427,6 +585,7 @@ export class TranscriptAnnotationComponent implements OnInit {
     deleteIndexes.sort((a, b) => {
       return a.startIndex > b.startIndex ? -1 : a.startIndex < b.startIndex ? 1 : 0;
     });
+    console.log(deleteIndexes);
     deleteIndexes.forEach(index => this.deleteFromTranscript(index.startIndex, index.endIndex));
   }
 
