@@ -618,14 +618,19 @@ export class TranscriptAnnotationComponent implements OnInit {
     const element = document.getElementById('temporaryText');
     if (element) {
       let recordedText = element.innerHTML;
-
-      // after first time inserted space has to be removed
+      // spaces at the beginning and the end have to be removed
       if (recordedText[0] === ' ') {
         recordedText = recordedText.substr(1, recordedText.length - 1);
+      }
+      if (recordedText[recordedText.length - 1] === ' ') {
+        recordedText = recordedText.substr(0, recordedText.length - 1);
       }
       let insertedText = this.inserted;
       if (insertedText[0] === ' ') {
         insertedText = insertedText.substr(1, insertedText.length - 1);
+      }
+      if (insertedText[insertedText.length - 1] === ' ') {
+        insertedText = insertedText.substr(0, insertedText.length - 1);
       }
       if (recordedText === insertedText) {
         return false;
