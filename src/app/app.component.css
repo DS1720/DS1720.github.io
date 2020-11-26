@@ -6,12 +6,22 @@
   Colors
  */
 
+/*
+-------------
+    Annotations
+  --pronunciation-color: #ffd500;
+  --grammar-color: #ec7134;
+  --wordchoice-color: #ff009b;
+  --tense-color: #ea2828;
+-------------
+ */
+
 :root :host /deep/ {
-  --pronunciation-color: #8c2c2c;
-  --grammar-color: #C8963E;
-  --wordchoice-color: #032340;
-  --tense-color: #7C9EB2;
-  --positive-color: #86BA90;
+  --pronunciation-color: #273e47;
+  --tense-color: #c8791f;
+  --grammar-color: #923268;
+  --wordchoice-color: #32939f;
+  --positive-color: #92bf9b;
   --negative-color: #c15050;
   --error-background: #bc3a3a;
   --delete-color: black;
@@ -94,6 +104,49 @@
   /*border-top: 2px solid var(--positive-color);
   border-bottom: 2px solid var(--positive-color);*/
   display: inline-block;
+}
+
+/*
+  Annotation buttons
+ */
+:host /deep/ button.pronunciation {
+  background-image: linear-gradient(to right, var(--button-background-color) 50%, var(--pronunciation-color) 50%);
+}
+
+:host /deep/ button.grammar {
+  background-image: linear-gradient(to right, var(--button-background-color) 50%, var(--grammar-color) 50%);
+}
+
+:host /deep/ button.wordchoice {
+  background-image: linear-gradient(to right, var(--button-background-color) 50%, var(--wordchoice-color) 50%);
+}
+
+:host /deep/ button.tense {
+  background-image: linear-gradient(to right, var(--button-background-color) 50%, var(--tense-color) 50%);
+}
+
+/*
+  Feedback
+ */
+
+:host /deep/ .pronunciation.tag {
+  border-left: var(--pronunciation-color) 15px solid;
+}
+
+:host /deep/ .grammar.tag {
+  border-left: var(--grammar-color) 15px solid;
+}
+
+:host /deep/ .wordchoice.tag {
+  border-left: var(--wordchoice-color) 15px solid;
+}
+
+:host /deep/ .tense.tag {
+  border-left: var(--tense-color) 15px solid;
+}
+
+:host /deep/ .positive.tag {
+  border-left: var(--positive-color) 15px solid;
 }
 
 /*

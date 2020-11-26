@@ -8,6 +8,7 @@ import {Subscription} from 'rxjs';
 import {BdcWalkService} from 'bdc-walkthrough';
 import {NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
 import {ToastService} from '../../shared/services/toast.service';
+import {StudentAnnotationType} from '../../shared/Entities/annotation-type';
 
 @Component({
   selector: 'wsa-feedback',
@@ -35,6 +36,7 @@ export class FeedbackComponent implements OnInit {
     {name: '', maxPoints: -1, reachedPoints: -1},
     '', '', []);
   showTranscript = false;
+  annotationTypes: string[] = [];
 
   // Walkthrough
   tutorial = false;
@@ -59,6 +61,9 @@ export class FeedbackComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    for (const error of Object.keys(StudentAnnotationType)) {
+      this.annotationTypes.push(error);
+    }
     this.tutorial = this.route.snapshot.queryParamMap.get('tutorial')
       ? this.route.snapshot.queryParamMap.get('tutorial') === 'true' : false;
     if (this.tutorial) {

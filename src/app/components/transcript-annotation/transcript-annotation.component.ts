@@ -8,7 +8,7 @@ import { ActionContext } from '../../shared/services/actions/action-context';
 import { SpeechNotification } from '../../shared/model/speech-notification';
 import {Annotation} from '../../shared/Entities/annotation';
 import {StudentAnnotationType} from '../../shared/Entities/annotation-type';
-import { faMicrophone, faMicrophoneSlash, faCheckCircle,  faTimesCircle} from '@fortawesome/free-solid-svg-icons';
+import { faMicrophone, faMicrophoneSlash, faCheckCircle,  faTimesCircle, faMinus, faPlus} from '@fortawesome/free-solid-svg-icons';
 import {ActivatedRoute, Router} from '@angular/router';
 import {DataService} from '../../shared/services/data.service';
 import {FeedbackSheet} from '../../shared/Entities/feedback-sheet';
@@ -27,6 +27,8 @@ export class TranscriptAnnotationComponent implements OnInit {
   faMicrophoneSlash = faMicrophoneSlash;
   faCheckCircle = faCheckCircle;
   faTimesCircle = faTimesCircle;
+  faMinusSquare = faMinus;
+  faPlusSquare = faPlus;
 
   transcriptToShow = 'Flamingos usually stand on one leg, with the other being tucked beneath the body. ' +
     'The reason for this behaviour is not fully understood. One theory is that standing on one leg allows the ' +
@@ -576,7 +578,7 @@ export class TranscriptAnnotationComponent implements OnInit {
     const deleteIndexes: {startIndex: number, endIndex: number}[] = [];
     annotations.forEach(annotation => {
       deleteIndexes.push({
-        startIndex: annotation.getEndIndex() - annotation.getOffsetBack() - 1,
+        startIndex: annotation.getEndIndex() - annotation.getOffsetBack(),
         endIndex: annotation.getEndIndex()
       });
       deleteIndexes.push({

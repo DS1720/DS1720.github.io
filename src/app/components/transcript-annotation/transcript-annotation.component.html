@@ -29,7 +29,7 @@
     </section>
     <section class="transcript-container">
       <label for="full-transcript">Full Transcript</label>
-      <div [bdcWalkTriggerFor]="deleteAnnotation2" [enabled]="tutorial" id="full-transcript">
+      <div #scrollMe [bdcWalkTriggerFor]="deleteAnnotation2" [enabled]="tutorial" id="full-transcript" [scrollTop]="scrollMe.scrollHeight">
         <span [bdcWalkTriggerFor]="annotate" [enabled]="tutorial" class="showSpaces transcipt" (click)="wordClicked($event)"
               [innerHTML]="totalTranscript | transcriptFormat"></span>
         <span [class.hide]="!showTemporaryText()" id="temporaryText">{{transcript$ | async}}</span>
@@ -46,16 +46,16 @@
       <div [bdcWalkTriggerFor]="selectAnnotationType" [enabled]="annotation == 'grammar' && tutorial"  class="annotation-item" *ngFor="let annotation of annotationTypes">
         <button [class.active]="annotation==activeAnnotationType && !activeAnnotationPositive" class="{{annotation.split(' ').join('')}}"
                 (click)="changeAnnotationType(annotation); setActiveAnnotationPositive(false)">
-          <div>{{annotation}}</div>
-          <div>-</div></button>
+          <div>{{annotation | capitalize}}</div>
+          <div><fa-icon [icon]="faMinusSquare"></fa-icon></div></button>
         <button [class.active]="annotation==activeAnnotationType && activeAnnotationPositive"
                 (click)="changeAnnotationType(annotation); setActiveAnnotationPositive(true)"
                 class="positive-annotation">
-          +</button>
+          <fa-icon [icon]="faPlusSquare"></fa-icon></button>
       </div>
       <div class="split-buttons">
-        <button [bdcWalkTriggerFor]="deleteAnnotation" [enabled]="tutorial" class="delete" [class.active]="'delete'==activeAnnotationType" (click)="changeAnnotationType('delete')">Delete</button>
-        <button [bdcWalkTriggerFor]="editWalkthrough" [enabled]="tutorial" class="edit" [class.active]="'edit'==activeAnnotationType" (click)="changeAnnotationType('edit')">Edit</button>
+        <button [bdcWalkTriggerFor]="deleteAnnotation" [enabled]="tutorial" class="delete" [class.active]="'delete'==activeAnnotationType" (click)="changeAnnotationType('delete')">Delete Annotation</button>
+        <button [bdcWalkTriggerFor]="editWalkthrough" [enabled]="tutorial" class="edit" [class.active]="'edit'==activeAnnotationType" (click)="changeAnnotationType('edit')">Edit Transcript</button>
       </div>
       <div class="split-buttons save-buttons">
         <button class="save" (click)="saveFeedbackAndTranscript()">Save</button>
@@ -84,7 +84,9 @@
 </bdc-walk-popup>
 
 <bdc-walk-popup #selectAnnotationType name="selectAnnotationType" sideNoteText="4/15" yPosition="below" xPosition="after" header="Select another Type" [horizontal]="true" [mustCompleted]="{annotate: true}" [closeOnClick]="true" [onButtonCompleteTask]="{selectAnnotationType: true}">
-  To select <b>another type</b> of annotations just click on one of these buttons on the right. You can also choose between <b>negative annotations</b> on the left side and <b>positive</b> on the right side marked in green.
+  To select <b>another type</b> of annotations just click on one of these buttons on the right.
+  You can choose between <b>negative annotations</b> on the left side in the color of the annotation
+  and <b>positive</b> on the right side marked in green.
   <br> <br>
   Select the <b>grammar button </b> to continue!
 </bdc-walk-popup>

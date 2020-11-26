@@ -1,15 +1,4 @@
 /*
--------------
-    Annotations
-  --pronunciation-color: #ffd500;
-  --grammar-color: #ec7134;
-  --wordchoice-color: #ff009b;
-  --tense-color: #ea2828;
--------------
- */
-
-
-/*
   Grid/Flexbox Styles
  */
 
@@ -271,22 +260,6 @@ textarea.notes-text-container {
 
 .student-annotations-container .annotation-item button:last-child.active {
   color: black;
-}
-
-button.pronunciation {
-  background-image: linear-gradient(to right, var(--button-background-color) 50%, var(--pronunciation-color) 50%);
-}
-
-button.grammar {
-  background-image: linear-gradient(to right, var(--button-background-color) 50%, var(--grammar-color) 50%);
-}
-
-button.wordchoice {
-  background-image: linear-gradient(to right, var(--button-background-color) 50%, var(--wordchoice-color) 50%);
-}
-
-button.tense {
-  background-image: linear-gradient(to right, var(--button-background-color) 50%, var(--tense-color) 50%);
 }
 
 button.delete {
