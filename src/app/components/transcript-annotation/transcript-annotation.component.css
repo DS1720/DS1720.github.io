@@ -51,7 +51,17 @@
 .student-properties-container {
   padding-top: 1rem;
   display: grid;
-  grid-template-columns: 70% 30%;
+  grid-template-columns: 50% 20% 30%;
+}
+
+/*
+  Timer
+ */
+.timer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 /*

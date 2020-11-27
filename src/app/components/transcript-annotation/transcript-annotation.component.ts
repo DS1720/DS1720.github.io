@@ -1,14 +1,14 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {merge, Observable, of, Subject, Subscription} from 'rxjs';
 import {count, first, last, map, tap} from 'rxjs/operators';
-import { defaultLanguage, languages } from '../../shared/model/languages';
-import { SpeechEvent } from '../../shared/model/speech-event';
-import { SpeechRecognizerService } from '../../shared/services/web-apis/speech-recognizer.service';
-import { ActionContext } from '../../shared/services/actions/action-context';
-import { SpeechNotification } from '../../shared/model/speech-notification';
+import {defaultLanguage, languages} from '../../shared/model/languages';
+import {SpeechEvent} from '../../shared/model/speech-event';
+import {SpeechRecognizerService} from '../../shared/services/web-apis/speech-recognizer.service';
+import {ActionContext} from '../../shared/services/actions/action-context';
+import {SpeechNotification} from '../../shared/model/speech-notification';
 import {Annotation} from '../../shared/Entities/annotation';
 import {StudentAnnotationType} from '../../shared/Entities/annotation-type';
-import { faMicrophone, faMicrophoneSlash, faCheckCircle,  faTimesCircle, faMinus, faPlus} from '@fortawesome/free-solid-svg-icons';
+import {faMicrophone, faMicrophoneSlash, faCheckCircle, faTimesCircle, faMinus, faPlus} from '@fortawesome/free-solid-svg-icons';
 import {ActivatedRoute, Router} from '@angular/router';
 import {DataService} from '../../shared/services/data.service';
 import {FeedbackSheet} from '../../shared/Entities/feedback-sheet';
@@ -60,7 +60,7 @@ export class TranscriptAnnotationComponent implements OnInit {
   exam = {name: 'Mid Term 2020S', maxPoints: 100, reachedPoints: 0};
   showEditPopup = false;
   textToEdit = '';
-  tagsInEdit: {id: number, start: boolean, type: string, positive: boolean}[] = [];
+  tagsInEdit: { id: number, start: boolean, type: string, positive: boolean }[] = [];
   feedbackSheet: FeedbackSheet = new FeedbackSheet(
     {id: -1, name: '', course: ''},
     {name: '', maxPoints: -1, reachedPoints: -1}, '', '', []);
@@ -68,6 +68,10 @@ export class TranscriptAnnotationComponent implements OnInit {
   editTextIndexes: number[] = [-1, -1];
   inserted = '';
   tutorial = false;
+  counter = 0;
+  // @ts-ignore
+  timerRef;
+  running = false;
 
   // Walkthrough
   id = 'transcriptWalkthorugh';
@@ -89,12 +93,12 @@ export class TranscriptAnnotationComponent implements OnInit {
     private dataService: DataService,
     private route: ActivatedRoute,
     private bdcWalkService: BdcWalkService,
-    private toastService: ToastService
-  ) {
+    private toastService: ToastService,
+    private changeDetectorRef: ChangeDetectorRef) {
   }
 
   ngOnInit(): void {
-    if ( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
       this.toastService.show('warning', 'This Feature is currently not fully tested for mobile devices! Your device might not be' +
         ' compatible with Speech Recognition. If errors occur switch to a Desktop device.', 10000);
     }
@@ -121,7 +125,6 @@ export class TranscriptAnnotationComponent implements OnInit {
     } else {
       this.feedbackSheet = new FeedbackSheet(this.activeStudent, this.exam, this.totalTranscript, '', []);
     }
-
     // walkthrough
     if (this.tutorial) {
       this.totalTranscript = this.transcriptToShow;
@@ -133,6 +136,30 @@ export class TranscriptAnnotationComponent implements OnInit {
   ngOnDestroy() {
     if (this.componentSubscription !== undefined) {
       this.componentSubscription.unsubscribe();
+    }
+  }
+
+  /**
+   * Starts timer if timer is stopped
+   */
+  startTimer(): void {
+    if (!this.running) {
+      const startTime = Date.now() - (this.counter || 0);
+      this.timerRef = setInterval(() => {
+        this.counter = Date.now() - startTime;
+        this.changeDetectorRef.detectChanges();
+      });
+      this.running = true;
+    }
+  }
+
+  /**
+   * Stops timer if timer is running
+   */
+  stopTimer(): void {
+    if (this.running) {
+      clearInterval(this.timerRef);
+      this.running = false;
     }
   }
 
@@ -175,7 +202,7 @@ export class TranscriptAnnotationComponent implements OnInit {
   /**
    * saves data to dataService
    */
-  saveFeedbackAndTranscript(): void{
+  saveFeedbackAndTranscript(): void {
     this.feedbackSheet.setFeedbackNotes(this.feedback);
     this.feedbackSheet.setTranscript(this.totalTranscript);
     this.dataService.saveFeedback(this.feedbackSheet);
@@ -245,16 +272,22 @@ export class TranscriptAnnotationComponent implements OnInit {
     this.tagsInEdit = Annotation.getAllTagsFromString(this.textToEdit);
   }
 
+  /**
+   * edits Text to make it wellformed
+   * all tags are closed properly
+   * all ids that are opened are closed again
+   * no > and < are in the text that are not a part of a tag
+   */
   confirmEditText(): void {
     // check if Tags were edited
-    const tempTags: {id: number, start: boolean, type: string, positive: boolean}[]
+    const tempTags: { id: number, start: boolean, type: string, positive: boolean }[]
       = Annotation.getAllTagsFromString(this.textToEdit);
     // sort arrays
     this.tagsInEdit.sort((a, b) => {
-      return a.id > b. id ? 1 : a.id < b.id ? -1 : a.start ? 1 : b.start ? -1 : 0;
+      return a.id > b.id ? 1 : a.id < b.id ? -1 : a.start ? 1 : b.start ? -1 : 0;
     });
     tempTags.sort((a, b) => {
-      return a.id > b. id ? 1 : a.id < b.id ? -1 : a.start ? 1 : b.start ? -1 : 0;
+      return a.id > b.id ? 1 : a.id < b.id ? -1 : a.start ? 1 : b.start ? -1 : 0;
     });
     let indexA = 0;
     let indexB = 0;
@@ -556,7 +589,7 @@ export class TranscriptAnnotationComponent implements OnInit {
         deleteAnnotations.push(annotation);
       }
       if (annotation.getStartIndex() <= startIndex && annotation.getEndIndex() >= endIndex) {
-        if (firstAnnotationOutside.getId() === -1 || firstAnnotationOutside.getStartIndex() < annotation.getStartIndex()){
+        if (firstAnnotationOutside.getId() === -1 || firstAnnotationOutside.getStartIndex() < annotation.getStartIndex()) {
           firstAnnotationOutside = annotation;
         }
       }
@@ -574,8 +607,10 @@ export class TranscriptAnnotationComponent implements OnInit {
    */
   private deleteAnnotationsFromTranscript(annotations: Annotation[]): void {
     console.log(annotations);
-    if (annotations.length <= 0) { return; }
-    const deleteIndexes: {startIndex: number, endIndex: number}[] = [];
+    if (annotations.length <= 0) {
+      return;
+    }
+    const deleteIndexes: { startIndex: number, endIndex: number }[] = [];
     annotations.forEach(annotation => {
       deleteIndexes.push({
         startIndex: annotation.getEndIndex() - annotation.getOffsetBack(),
@@ -662,6 +697,7 @@ export class TranscriptAnnotationComponent implements OnInit {
       return;
     }
     this.speechRecognizer.start();
+    this.startTimer();
   }
 
   /**
@@ -669,6 +705,7 @@ export class TranscriptAnnotationComponent implements OnInit {
    */
   private stop(): void {
     this.speechRecognizer.stop();
+    this.stopTimer();
   }
 
   /**

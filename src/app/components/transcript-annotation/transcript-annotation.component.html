@@ -16,6 +16,12 @@
         <h1>{{activeStudent.name}}</h1>
         {{exam.name}} | {{activeStudent.course}}
       </div>
+      <div class="timer">
+        <div>Time recorded:</div>
+        <h2>
+          {{counter | date: 'HH:mm:ss' : 'UTC'}}
+        </h2>
+      </div>
       <div class="record-button" *ngIf="!edit">
         <button [bdcWalkTriggerFor]="recordButton" [enabled]="tutorial" (click)="toggleListening()" [class.active]="isListening">
           <fa-icon *ngIf="isListening" [icon]="faMicrophone"></fa-icon>

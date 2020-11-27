@@ -6,24 +6,13 @@
   Colors
  */
 
-/*
--------------
-    Annotations
-  --pronunciation-color: #ffd500;
-  --grammar-color: #ec7134;
-  --wordchoice-color: #ff009b;
-  --tense-color: #ea2828;
--------------
- */
-
 :root :host /deep/ {
-  --pronunciation-color: #273e47;
+  --pronunciation-color: #86466a;
   --tense-color: #c8791f;
-  --grammar-color: #923268;
-  --wordchoice-color: #32939f;
+  --grammar-color: #032340;
+  --wordchoice-color: #7C9EB2;
   --positive-color: #92bf9b;
-  --negative-color: #c15050;
-  --error-background: #bc3a3a;
+  --negative-color: #bc3a3a;
   --delete-color: black;
   --edit-color: black;
   --save-color: black;

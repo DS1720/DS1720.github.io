@@ -8,9 +8,9 @@ import { CapitalizePipe } from './services/pipes/capitalize.pipe';
   imports: [
     CommonModule,
   ],
-    exports: [
-        TranscriptFormatPipe,
-        CapitalizePipe
-    ]
+  exports: [
+    TranscriptFormatPipe,
+    CapitalizePipe
+  ]
 })
 export class SharedModule { }
