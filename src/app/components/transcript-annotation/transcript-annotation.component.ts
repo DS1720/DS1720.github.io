@@ -130,6 +130,17 @@ export class TranscriptAnnotationComponent implements OnInit {
       this.totalTranscript = this.transcriptToShow;
       this.componentSubscription = this.bdcWalkService.changes.subscribe(() => this.onTaskChanges());
     }
+
+    // end timer when recognition stops
+    this.speechRecognizer.startListeningSubject.subscribe(value => {
+      if (!value) {
+        this.stopTimer();
+        this.changeDetectorRef.detectChanges();
+      } else {
+        this.startTimer();
+        this.changeDetectorRef.detectChanges();
+      }
+    });
   }
 
   // tslint:disable-next-line:typedef use-lifecycle-interface
@@ -697,7 +708,6 @@ export class TranscriptAnnotationComponent implements OnInit {
       return;
     }
     this.speechRecognizer.start();
-    this.startTimer();
   }
 
   /**
@@ -705,7 +715,6 @@ export class TranscriptAnnotationComponent implements OnInit {
    */
   private stop(): void {
     this.speechRecognizer.stop();
-    this.stopTimer();
   }
 
   /**

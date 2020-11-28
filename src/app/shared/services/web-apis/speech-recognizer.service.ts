@@ -15,6 +15,8 @@ export class SpeechRecognizerService {
   recognition!: SpeechRecognition;
   language!: string;
   isListening = false;
+  startListeningSubject = new Subject<boolean>();
+  timeNetworkError = Date.now() - 4000;
 
   constructor(private ngZone: NgZone, private toastService: ToastService) {
   }
@@ -32,9 +34,11 @@ export class SpeechRecognizerService {
       this.setLanguage(language);
       this.recognition.addEventListener('end', () => {
         this.isListening = false;
-        this.toastService.show('warning', 'Recording Stopped', 10000);
+        this.startListeningSubject.next(false);
+        this.toastService.show('warning', 'Recording Stopped');
       });
       this.recognition.addEventListener('start', () => {
+        this.startListeningSubject.next(true);
         this.toastService.show('warning', 'Recording Started');
       });
 
@@ -54,7 +58,15 @@ export class SpeechRecognizerService {
             Verify that your browser has access to your microphone and try again.`);
             break;
           case 'network':
-            this.toastService.show('error', `A network communication is needed for the recognition.`);
+            // try to restart because 5 Minute Mark was reached, else error
+            if (Date.now() - this.timeNetworkError > 4000) {
+              setTimeout(() => {
+                this.start();
+              }, 1000);
+            } else {
+              this.toastService.show('error', `A network communication is needed for the recognition.`);
+            }
+            this.timeNetworkError = Date.now();
             break;
           default:
             this.toastService.show('error', `An unknown error occured.`);
