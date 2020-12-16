@@ -74,7 +74,7 @@
   </section>
   <section id="notes-container" *ngIf="feedbackSheet.getFeedbackNotes() != '' || edit">
     <label for="notes-container"><h2>Notes from Examiner:</h2></label>
-    <span *ngIf="!edit">{{feedbackSheet.getFeedbackNotes()}}</span>
+    <div *ngIf="!edit">{{feedbackSheet.getFeedbackNotes()}}</div>
     <textarea [bdcWalkTriggerFor]="notes" [enabled]="tutorial" placeholder="insert notes..." *ngIf="edit" [ngModel]="feedbackSheet.getFeedbackNotes()"
               (ngModelChange)="feedbackSheet.setFeedbackNotes($event)"></textarea>
   </section>
