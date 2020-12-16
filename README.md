@@ -1,4 +1,4 @@
-#Feedback on Oral Exams - a new Approach Supported by Speech Recognition
+# Feedback on Oral Exams - a new Approach Supported by Speech Recognition
 This application combines the Web Speech API with an Angular-based user interface. The application helps an examiner evaluate and grade oral exercises.
 
 ## Running the Project Locally
